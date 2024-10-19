@@ -1,3 +1,4 @@
+import 'package:finalproject/Views/RegisterScreen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -34,6 +35,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+
+  get child => null;
 
   void _incrementCounter() {
     setState(() {
@@ -79,30 +82,28 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
 
 
-        Text("First name:", style: TextStyle(fontSize: 20),),
 
-        TextField(
-          decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: ' First name'
-          ),
-        ),
 
-        Text("Last name:", style: TextStyle(fontSize: 20),),
+            TextButton(
+              style: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+              ),
+               onPressed: () {},
 
-        TextField(
-          decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: ' Last name'
-          ),
-        ),
+              child: Text('login'),
+            ),
 
         TextButton(
           style: ButtonStyle(
             foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
           ),
-          onPressed: () {},
-          child: Text('Register'),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const RegisterScreen(title: "new account")),
+            );
+          },
+          child: Text('create new account'),
         ),
       ],
       ),
