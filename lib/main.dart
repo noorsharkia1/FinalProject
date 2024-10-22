@@ -103,6 +103,21 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               child: Text('Home Page'),
             ),
+
+            IconButton(
+              icon: Icon(Icons.person),
+              color: Colors.purple,
+              splashColor: Colors.white,
+              iconSize: 36.0,
+              padding: EdgeInsets.all(8.0),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Edit)
+                )
+              },
+            )
+            
           ],
         ),
       ),
