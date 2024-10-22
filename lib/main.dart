@@ -1,3 +1,4 @@
+import 'package:finalproject/Views/EditedProfile.dart';
 import 'package:finalproject/Views/HomePageScreen.dart';
 import 'package:finalproject/Views/RegisterScreen.dart';
 import 'package:flutter/material.dart';
@@ -46,8 +47,20 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+
+        title: IconButton(
+          icon: Icon(Icons.person),
+          color: Colors.purple,
+          splashColor: Colors.white,
+          iconSize: 36.0,
+          padding: EdgeInsets.all(8.0),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const EditedProfile(title: 'Edited Profile'))
+            );
+          },
+        ),
       ),
       body: Center(
         child: Column(
@@ -104,19 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text('Home Page'),
             ),
 
-            IconButton(
-              icon: Icon(Icons.person),
-              color: Colors.purple,
-              splashColor: Colors.white,
-              iconSize: 36.0,
-              padding: EdgeInsets.all(8.0),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Edit)
-                )
-              },
-            )
+
             
           ],
         ),
