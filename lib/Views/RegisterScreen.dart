@@ -78,8 +78,7 @@ class RegisterscreenPageState extends State<RegisterScreen> {
                   hintText: ' Last name'
               ),
             ),
-
-            TextButton(
+      TextButton(
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
               ),

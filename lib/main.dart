@@ -104,6 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text(''
                   'create new account'),
             ),
+
             TextButton(
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
@@ -116,6 +117,17 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               child: Text('Home Page'),
             ),
+
+            TextButton(
+                child: Icon(Icons.data_eye),
+                onPressed: () => showDialog(context: context, builder: (BuildContext context){
+                  return AlertDialog(
+                    content: Text("Whatever Widget"),
+                  );
+                })
+            )
+
+
 
 
             
