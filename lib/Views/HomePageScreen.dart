@@ -35,11 +35,17 @@ class HomePageScreenPageState extends State<HomePageScreen> {
         title: Text(widget.title),
       ),
       body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+
+          ],
+        ),
 
 
 
 
-    ),
+      ),
     );
   }
 }

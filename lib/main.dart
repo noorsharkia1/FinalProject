@@ -1,3 +1,4 @@
+import 'package:finalproject/Views/HomePageScreen.dart';
 import 'package:finalproject/Views/RegisterScreen.dart';
 import 'package:flutter/material.dart';
 
@@ -87,7 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           const RegisterScreen(title: "new account")),
                 );
               },
-              child: Text('Home Page'),
+              child: Text(''
+                  'create new account'),
             ),
             TextButton(
               style: ButtonStyle(
@@ -96,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const HomePageScreen()));
+                  MaterialPageRoute(builder: (context) => const HomePageScreen(title: 'Home Page')));
 
               },
               child: Text('Home Page'),
