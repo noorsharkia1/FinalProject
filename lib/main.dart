@@ -119,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
 
             TextButton(
-                child: Icon(Icons.data_eye),
+                child: Icon(Icons.remove_red_eye_rounded),
                 onPressed: () => showDialog(context: context, builder: (BuildContext context){
                   return AlertDialog(
                     content: Text("Whatever Widget"),
