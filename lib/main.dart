@@ -118,14 +118,14 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text('Home Page'),
             ),
 
-            TextButton(
+           /* TextButton(
                 child: Icon(Icons.remove_red_eye_rounded),
                 onPressed: () => showDialog(context: context, builder: (BuildContext context){
                   return AlertDialog(
                     content: Text("Whatever Widget"),
                   );
                 })
-            )
+            )*/
 
 
 
