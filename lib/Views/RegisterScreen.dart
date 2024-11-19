@@ -69,6 +69,7 @@ class RegisterscreenPageState extends State<RegisterScreen> {
               onPressed: () {
                 var Uti = new Utils();
                 Uti.showMyDialog(context, _textPassword.text, _textFirstName.text);
+                insertUser(_textFirstName.text,_textLastName.text,_textPassword.text);
               },
               child: Text('Register'),
             ),
