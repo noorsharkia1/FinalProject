@@ -1,3 +1,4 @@
+import 'package:finalproject/Models/Client.dart';
 import 'package:finalproject/Utils/utils.dart';
 import 'package:finalproject/main.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,25 @@ class RegisterscreenPageState extends State<RegisterScreen> {
   final TextEditingController _textLastName = new TextEditingController();
   final TextEditingController _textPassword = new TextEditingController();
 
+  var _txtFirstName= new TextEditingController();
+  var _txtLastName= new TextEditingController();
+  var _txtPassword = new TextEditingController();
+  var _txtEmail = new TextEditingController();
+
+  
+  void insertUserFunc()
+  {
+    if(_txtFirstName.text != "" && _txtEmail.text != ""  && _textPassword.text != "")
+      {
+        var client = new Client();
+        client.firstName = _txtFirstName.text;
+        client.lastName= _txtLastName.text;
+        client.password = _txtPassword.text;
+        client.email=_txtEmail.text;
+      }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,23 +47,6 @@ class RegisterscreenPageState extends State<RegisterScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              "Email:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: ' Email'),
-            ),
-            Text(
-              "Password:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              controller: _textPassword,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: ' Password'),
-            ),
             Text(
               "First name:",
               style: TextStyle(fontSize: 20),
@@ -62,6 +65,24 @@ class RegisterscreenPageState extends State<RegisterScreen> {
               decoration: InputDecoration(
                   border: OutlineInputBorder(), hintText: ' Last name'),
             ),
+            Text(
+              "Email:",
+              style: TextStyle(fontSize: 20),
+            ),
+            TextField(
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(), hintText: ' Email'),
+            ),
+            Text(
+              "Password:",
+              style: TextStyle(fontSize: 20),
+            ),
+            TextField(
+              controller: _textPassword,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(), hintText: ' Password'),
+            ),
+
             TextButton(
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
@@ -69,10 +90,11 @@ class RegisterscreenPageState extends State<RegisterScreen> {
               onPressed: () {
                 var Uti = new Utils();
                 Uti.showMyDialog(context, _textPassword.text, _textFirstName.text);
-                insertUser(_textFirstName.text,_textLastName.text,_textPassword.text);
+                //insertUser(_textFirstName.text,_textLastName.text,_textPassword.text);
               },
               child: Text('Register'),
             ),
+
           ],
         ),
       ),

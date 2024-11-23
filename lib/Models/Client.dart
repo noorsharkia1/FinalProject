@@ -1,8 +1,8 @@
 
 import 'dart:convert';
-class User
+class Client
 {
-  User({
+  Client({
 
   this.firstName= "",
   this.lastName= "",
@@ -24,7 +24,7 @@ class User
   String age;
 
 
-  factory User.fromJson(Map<String,dynamic> json)=> User(
+  factory Client.fromJson(Map<String,dynamic> json)=> Client(
    firstName: json["firstName"],
     lastName: json["lastName"],
     email:json["email"],
