@@ -32,6 +32,12 @@ class RegisterscreenPageState extends State<RegisterScreen> {
         client.lastName= _txtLastName.text;
         client.password = _txtPassword.text;
         client.email=_txtEmail.text;
+        // in
+      }
+    else
+      {
+        var Uti = new Utils();
+        Uti.showMyDialog(context, "Required", "first name, password and email is required.");
       }
 
   }
@@ -48,7 +54,7 @@ class RegisterscreenPageState extends State<RegisterScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              "First name:",
+              "First name*:",
               style: TextStyle(fontSize: 20),
             ),
             TextField(
@@ -66,7 +72,7 @@ class RegisterscreenPageState extends State<RegisterScreen> {
                   border: OutlineInputBorder(), hintText: ' Last name'),
             ),
             Text(
-              "Email:",
+              "Email*:",
               style: TextStyle(fontSize: 20),
             ),
             TextField(
@@ -74,7 +80,7 @@ class RegisterscreenPageState extends State<RegisterScreen> {
                   border: OutlineInputBorder(), hintText: ' Email'),
             ),
             Text(
-              "Password:",
+              "Password*:",
               style: TextStyle(fontSize: 20),
             ),
             TextField(
