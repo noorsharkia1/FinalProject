@@ -88,6 +88,33 @@ class RegisterscreenPageState extends State<RegisterScreen> {
               decoration: InputDecoration(
                   border: OutlineInputBorder(), hintText: ' Password'),
             ),
+            Text(
+              "height:",
+              style: TextStyle(fontSize: 20),
+            ),
+            TextField(
+              controller: _textPassword,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(), hintText: ' height'),
+            ),
+            Text(
+              "weight:",
+              style: TextStyle(fontSize: 20),
+            ),
+            TextField(
+              controller: _textPassword,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(), hintText: ' weight'),
+            ),
+            Text(
+              "Gender:",
+              style: TextStyle(fontSize: 20),
+            ),
+            TextField(
+              controller: _textPassword,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(), hintText: ' Gender'),
+            ),
 
             TextButton(
               style: ButtonStyle(
