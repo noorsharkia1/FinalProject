@@ -86,7 +86,12 @@ class _MyHomePageState extends State<MyHomePage> {
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePageScreen(title: 'Home Page')));
+
+              },
               child: Text('login'),
             ),
             TextButton(
@@ -101,22 +106,16 @@ class _MyHomePageState extends State<MyHomePage> {
                           const RegisterScreen(title: "new account")),
                 );
               },
-              child: Text(''
-                  'create new account'),
+              child: Text('create new account'),
             ),
 
-            TextButton(
+            /*TextButton(
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomePageScreen(title: 'Home Page')));
 
-              },
               child: Text('Home Page'),
-            ),
+            ),*/
 
            /* TextButton(
                 child: Icon(Icons.remove_red_eye_rounded),

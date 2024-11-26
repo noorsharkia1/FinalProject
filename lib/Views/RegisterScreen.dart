@@ -1,7 +1,11 @@
 import 'package:finalproject/Models/Client.dart';
+import 'package:finalproject/Utils/ClientConfig.dart';
 import 'package:finalproject/Utils/utils.dart';
+import 'package:finalproject/Views/CoachCalendar.dart';
 import 'package:finalproject/main.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key, required this.title});
@@ -44,6 +48,18 @@ class RegisterscreenPageState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+
+    Future insertUser(BuildContext context, String firstName, String lastName) async {
+      //   SharedPreferences prefs = await SharedPreferences.getInstance();
+      //  String? getInfoDeviceSTR = prefs.getString("getInfoDeviceSTR");
+      var url = "users/insertUser.php?firstName=" + firstName + "&lastName=" + lastName;
+      final response = await http.get(Uri.parse(serverPath + url));
+      // print(serverPath + url);
+      setState(() { });
+      Navigator.pop(context);
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -88,16 +104,44 @@ class RegisterscreenPageState extends State<RegisterScreen> {
               decoration: InputDecoration(
                   border: OutlineInputBorder(), hintText: ' Password'),
             ),
+            Text(
+              "height:",
+              style: TextStyle(fontSize: 20),
+            ),
+            TextField(
+              controller: _textPassword,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(), hintText: ' height'),
+            ),
+            Text(
+              "weight:",
+              style: TextStyle(fontSize: 20),
+            ),
+            TextField(
+              controller: _textPassword,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(), hintText: ' weight'),
+            ),
+            Text(
+              "Gender:",
+              style: TextStyle(fontSize: 20),
+            ),
+            TextField(
+              controller: _textPassword,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(), hintText: ' Gender'),
+            ),
 
             TextButton(
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
               ),
               onPressed: () {
-                var Uti = new Utils();
-                Uti.showMyDialog(context, _textPassword.text, _textFirstName.text);
-                //insertUser(_textFirstName.text,_textLastName.text,_textPassword.text);
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CoachCalendarScreen(title: 'CoachCalendar')));
               },
+
               child: Text('Register'),
             ),
 
