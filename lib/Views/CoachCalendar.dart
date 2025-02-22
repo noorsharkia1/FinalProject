@@ -13,23 +13,23 @@ class CoachCalendarScreenPageState extends State<CoachCalendarScreen> {
   DateTime selectedDate = DateTime.now();
   List<DateTime> dates = List.generate(
     30, // عدد الأيام في الرزنامة
-        (index) => DateTime.now().add(Duration(days: index)),
+        (index) => DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
+        .add(Duration(days: index)),
   );
 
-  // قائمة المهام اليومية المرتبطة بكل تاريخ (مثال بيانات مع اسم العميل والساعة)
+  // قائمة المهام اليومية المرتبطة بكل تاريخ
   Map<DateTime, List<Task>> dailyTasks = {
     DateTime.now(): [
       Task(customerName: "أحمد", time: "10:00 AM"),
       Task(customerName: "سارة", time: "11:30 AM"),
       Task(customerName: "محمد", time: "2:00 PM"),
-    ], // مثال لبعض المهام
+    ],
     DateTime.now().add(Duration(days: 1)): [
       Task(customerName: "علي", time: "9:00 AM"),
       Task(customerName: "ريم", time: "4:30 PM"),
     ],
   };
 
-  // هذا سيُنفذ عندما يضغط المستخدم على تاريخ
   void _onDateSelected(DateTime date) {
     setState(() {
       selectedDate = date;
@@ -43,30 +43,72 @@ class CoachCalendarScreenPageState extends State<CoachCalendarScreen> {
     });
   }
 
+  // دالة لعرض تفاصيل العميل (بيانات افتراضية)
+  void _showCustomerDetails(Task task) {
+    String firstName = "أحمد";
+    String lastName = "الرفاعي";
+    String weight = "70 kg";
+    String gender = "ذكر";
+    String email = "ahmed@example.com";
+
+    // عرض نافذة منبثقة (Popup)
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text('تفاصيل العميل: ${task.customerName}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('الاسم الأول: $firstName'),
+              Text('الاسم الأخير: $lastName'),
+              Text('الوزن: $weight'),
+              Text('الجنس: $gender'),
+              Text('البريد الإلكتروني: $email'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text('إغلاق', style: TextStyle(color: Colors.blue)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // تحويل المهام اليومية الخاصة بالتاريخ المحدد
     List<Task> tasksForSelectedDate = dailyTasks[selectedDate] ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.blueAccent,
+        elevation: 5,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // عرض التاريخ المحدد
             Text(
               'التاريخ المحدد: ${DateFormat('dd MMM yyyy').format(selectedDate)}',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent),
             ),
             SizedBox(height: 20),
+            // عرض اختيارات التواريخ
             DateTimelinePicker(
               dates: dates,
               selectedDate: selectedDate,
               onDateSelected: _onDateSelected,
-              selectedDateColor: Colors.blue,
+              selectedDateColor: Colors.blueAccent,
               unselectedDateColor: Colors.grey,
               selectedDateTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               unselectedDateTextStyle: TextStyle(color: Colors.black),
@@ -74,13 +116,9 @@ class CoachCalendarScreenPageState extends State<CoachCalendarScreen> {
               itemHeight: 50.0,
             ),
             SizedBox(height: 20),
-            // عرض المهام اليومية لهذا التاريخ داخل أزرار
-            Text(
-              'المهام اليومية لهذا التاريخ:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
+            Text('المهام اليومية لهذا التاريخ:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
             SizedBox(height: 10),
-            // عرض المهام كأزرار يمكن النقر عليها
+            // عرض المهام كأزرار تفاعلية
             Wrap(
               spacing: 10.0,
               runSpacing: 10.0,
@@ -89,17 +127,15 @@ class CoachCalendarScreenPageState extends State<CoachCalendarScreen> {
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                    backgroundColor: Colors.blueAccent,
+                    backgroundColor: Colors.blueAccent, // تم استبدال `primary` بـ `backgroundColor`
+                    shadowColor: Colors.blue.withOpacity(0.5),
+                    elevation: 5,
                   ),
                   onPressed: () {
-                    // هنا يمكنك إضافة الكود لربط الزر بصفحة أخرى
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('تم الضغط على مهمة: ${task.customerName}')),
-                    );
+                    _showCustomerDetails(task);
                   },
                   child: Row(
                     children: [
-                      // عرض اسم العميل والساعة
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -107,7 +143,6 @@ class CoachCalendarScreenPageState extends State<CoachCalendarScreen> {
                           Text('الساعة: ${task.time}', style: TextStyle(color: Colors.white)),
                         ],
                       ),
-                      // زر تعديل لحذف المهمة
                       Spacer(),
                       IconButton(
                         icon: Icon(Icons.delete, color: Colors.white),
@@ -197,4 +232,3 @@ class DateTimelinePicker extends StatelessWidget {
     );
   }
 }
-
