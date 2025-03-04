@@ -1,3 +1,4 @@
+import 'package:finalproject/Views/CvsT.dart';
 import 'package:finalproject/Views/EditedProfile.dart';
 import 'package:finalproject/Views/HomePageScreen.dart';
 import 'package:finalproject/Views/RegisterScreen.dart';
@@ -103,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          const RegisterScreen(title: "new account")),
+                          const CvsTScreen(title: "new account")),
                 );
               },
               child: Text('create new account'),
