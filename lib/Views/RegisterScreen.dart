@@ -1,10 +1,10 @@
 import 'package:finalproject/Models/Client.dart';
 import 'package:finalproject/Utils/ClientConfig.dart';
 import 'package:finalproject/Utils/utils.dart';
-import 'package:finalproject/Views/CoachCalendar.dart';
 import 'package:finalproject/main.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:finalproject/Views/HomePage.dart';
 
 
 class RegisterScreen extends StatefulWidget {
@@ -139,7 +139,7 @@ class RegisterscreenPageState extends State<RegisterScreen> {
               onPressed: () {
               Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const CoachCalendarScreen(title: 'CoachCalendar')));
+              MaterialPageRoute(builder: (context) => const HomePageScreen(title: '')));
               },
 
               child: Text('Register'),

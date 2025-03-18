@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:finalproject/Views/CoachRegister.dart'; // تأكد من استيراد شاشة CoachRegister
+import 'package:finalproject/Views/RegisterScreen.dart'; // تأكد من استيراد شاشة RegisterScreen
 
 class CvsTScreen extends StatefulWidget {
   const CvsTScreen({super.key, required this.title});
@@ -13,13 +15,13 @@ class CvsTScreenPageState extends State<CvsTScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // خلفية بيضاء
+      backgroundColor: Color(0xFFD1C4E9), // خلفية باللون الليلكي الفاتح
       appBar: AppBar(
         title: Text(
           widget.title,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.white),
         ),
-        backgroundColor: Colors.blueAccent, // لون الخلفية الأزرق
+        backgroundColor: Color(0xFF9575CD), // اللون الأزرق الليلكي الداكن
         elevation: 0, // إزالة الظل
       ),
       body: Padding(
@@ -34,7 +36,7 @@ class CvsTScreenPageState extends State<CvsTScreen> {
               style: TextStyle(
                 fontSize: 36, // جعل الخط أكبر
                 fontWeight: FontWeight.bold,
-                color: Colors.blueAccent, // لون أزرق فاتح
+                color: Color(0xFF9575CD), // اللون الأزرق الليلكي
               ),
             ),
             SizedBox(height: 40),
@@ -43,9 +45,25 @@ class CvsTScreenPageState extends State<CvsTScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _buildChoiceButton('Coach', Colors.blue.shade300, Icons.sports_handball),
+                _buildChoiceButton('Coach', Color(0xFF9575CD), Icons.sports_handball, () {
+                  // الانتقال إلى شاشة CoachRegister عند الضغط على "Coach"
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CoachRegister(title: 'Coach Register'),
+                    ),
+                  );
+                }),
                 SizedBox(height: 20),
-                _buildChoiceButton('Trainer', Colors.green.shade300, Icons.fitness_center),
+                _buildChoiceButton('Trainer', Color(0xFF66BB6A), Icons.fitness_center, () {
+                  // الانتقال إلى شاشة RegisterScreen عند الضغط على "Trainer"
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RegisterScreen(title: 'Trainer Register'),
+                    ),
+                  );
+                }),
               ],
             ),
             SizedBox(height: 40),
@@ -70,20 +88,15 @@ class CvsTScreenPageState extends State<CvsTScreen> {
   }
 
   // دالة بناء الأزرار مع تأثيرات الحركة
-  Widget _buildChoiceButton(String label, Color color, IconData icon) {
+  Widget _buildChoiceButton(String label, Color color, IconData icon, VoidCallback onPressed) {
     return GestureDetector(
-      onTap: () {
-        // هنا يمكن تنفيذ الإجراء عند اختيار Coach أو Trainer
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('You selected $label')),
-        );
-      },
+      onTap: onPressed, // تنفيذ الإجراء عند الضغط على الزر
       child: AnimatedContainer(
         duration: Duration(milliseconds: 300),
-        padding: EdgeInsets.symmetric(horizontal: 60, vertical: 20),
+        padding: EdgeInsets.symmetric(horizontal: 80, vertical: 25), // تكبير الأزرار
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(35), // حواف دائرية
           boxShadow: [
             BoxShadow(
               color: color.withOpacity(0.3),
@@ -100,12 +113,12 @@ class CvsTScreenPageState extends State<CvsTScreen> {
               color: Colors.white,
               size: 30,
             ),
-            SizedBox(width: 10),
+            SizedBox(width: 15),
             Text(
               label,
               style: TextStyle(
                 fontSize: 22,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),

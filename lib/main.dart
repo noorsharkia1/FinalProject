@@ -1,6 +1,6 @@
 import 'package:finalproject/Views/CvsT.dart';
 import 'package:finalproject/Views/EditedProfile.dart';
-import 'package:finalproject/Views/HomePageScreen.dart';
+import 'package:finalproject/Views/HomePage.dart';
 import 'package:finalproject/Views/RegisterScreen.dart';
 import 'package:flutter/material.dart';
 

@@ -88,8 +88,11 @@ class CoachCalendarScreenPageState extends State<CoachCalendarScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.blueAccent,
+        title: Text(
+          widget.title,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Color(0xFF6A1B9A), // لون ليلكي داكن
         elevation: 5,
       ),
       body: Padding(
@@ -100,7 +103,7 @@ class CoachCalendarScreenPageState extends State<CoachCalendarScreen> {
             // عرض التاريخ المحدد
             Text(
               'التاريخ المحدد: ${DateFormat('dd MMM yyyy').format(selectedDate)}',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF6A1B9A)),
             ),
             SizedBox(height: 20),
             // عرض اختيارات التواريخ
@@ -108,7 +111,7 @@ class CoachCalendarScreenPageState extends State<CoachCalendarScreen> {
               dates: dates,
               selectedDate: selectedDate,
               onDateSelected: _onDateSelected,
-              selectedDateColor: Colors.blueAccent,
+              selectedDateColor: Color(0xFF6A1B9A),
               unselectedDateColor: Colors.grey,
               selectedDateTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               unselectedDateTextStyle: TextStyle(color: Colors.black),
@@ -127,8 +130,8 @@ class CoachCalendarScreenPageState extends State<CoachCalendarScreen> {
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                    backgroundColor: Colors.blueAccent, // تم استبدال `primary` بـ `backgroundColor`
-                    shadowColor: Colors.blue.withOpacity(0.5),
+                    backgroundColor: Color(0xFF6A1B9A), // تم استبدال `primary` بـ `backgroundColor`
+                    shadowColor: Color(0xFF6A1B9A).withOpacity(0.5),
                     elevation: 5,
                   ),
                   onPressed: () {
