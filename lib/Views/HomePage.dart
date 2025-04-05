@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:finalproject/Views/TrainerProfile.dart';
+import 'package:finalproject/Views/TrainerCalendar.dart';
+import 'package:finalproject/Views/CoachList.dart';
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({super.key, required this.title});
 
@@ -43,15 +45,33 @@ class HomePageScreenPageState extends State<HomePageScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               // زر Calendar
-              _buildCustomButton('Calendar', Color(0xFF9575CD), Icons.calendar_today),
+              _buildCustomButton('Calendar', Color(0xFF9575CD), Icons.calendar_today, onPressed: () {
+                // الانتقال إلى صفحة TrainerCalendar عند الضغط على الزر Calendar
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TrainerCalendar(title: "Trainer Calendar")),
+                );
+              }),
               SizedBox(height: 20),
 
               // زر Profile
-              _buildCustomButton('Profile', Color(0xFFAB8EE8), Icons.account_circle),
+              _buildCustomButton('Profile', Color(0xFFAB8EE8), Icons.account_circle, onPressed: () {
+                // الانتقال إلى صفحة TrainerProfile
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TrainerProfile(title: "Trainer Profile")),
+                );
+              }),
               SizedBox(height: 20),
 
-              // زر Add
-              _buildCustomButton('Add', Color(0xFFE1BEE7), Icons.add),
+              // زر Coach
+              _buildCustomButton('Coach', Color(0xFFE1BEE7), Icons.add, onPressed: () {
+                // الانتقال إلى صفحة CoachList عند الضغط على الزر Coach
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CoachList(title: "Coach List")),
+                );
+              }),
             ],
           ),
         ),
@@ -60,9 +80,9 @@ class HomePageScreenPageState extends State<HomePageScreen> {
   }
 
   // دالة لبناء الأزرار بتنسيق حديث وكبير
-  Widget _buildCustomButton(String label, Color color, IconData icon) {
+  Widget _buildCustomButton(String label, Color color, IconData icon, {VoidCallback? onPressed}) {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: onPressed ?? () {
         // هنا يمكنك إضافة المنطق الذي تود تنفيذه عند الضغط على الزر
       },
       style: ElevatedButton.styleFrom(

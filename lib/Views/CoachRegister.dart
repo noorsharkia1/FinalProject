@@ -1,12 +1,8 @@
-import 'package:finalproject/Models/Client.dart';
-import 'package:finalproject/Utils/ClientConfig.dart';
-import 'package:finalproject/Utils/utils.dart';
-import 'package:finalproject/Views/CoachCalendar.dart'; // Ensure this import is correct
-import 'package:finalproject/main.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart'; // مكتبة اختيار الصور
+import 'dart:io'; // مكتبة التعامل مع الملفات
 import 'package:http/http.dart' as http;
-import 'package:finalproject/Views/CoachCalendar.dart';
-
+import 'package:finalproject/Views/CoachCalendar.dart'; // تأكد من وجود هذا المسار
 
 class CoachRegister extends StatefulWidget {
   const CoachRegister({super.key, required this.title});
@@ -18,95 +14,152 @@ class CoachRegister extends StatefulWidget {
 }
 
 class CoachRegisterPageState extends State<CoachRegister> {
-  final TextEditingController _textFirstName = new TextEditingController();
-  final TextEditingController _textLastName = new TextEditingController();
-  final TextEditingController _textPassword = new TextEditingController();
+  final TextEditingController _textFirstName = TextEditingController();
+  final TextEditingController _textLastName = TextEditingController();
+  final TextEditingController _textPassword = TextEditingController();
+  final TextEditingController _textEmail = TextEditingController();
 
-  var _txtFirstName = new TextEditingController();
-  var _txtLastName = new TextEditingController();
-  var _txtPassword = new TextEditingController();
-  var _txtEmail = new TextEditingController();
+  File? _image; // لتخزين الصورة التي يتم اختيارها
 
+  // دالة لاختيار الصورة
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    // اختيار الصورة من المعرض
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path); // تخزين الصورة المختارة
+      });
+    }
+  }
+
+  // دالة لإضافة المدرب
   void insertUserFunc() {
-    if (_txtFirstName.text != "" && _txtEmail.text != "" && _textPassword.text != "") {
-      var client = new Client();
-      client.firstName = _txtFirstName.text;
-      client.lastName = _txtLastName.text;
-      client.password = _txtPassword.text;
-      client.email = _txtEmail.text;
-      // Add user registration logic here if needed
+    if (_textFirstName.text != "" && _textEmail.text != "" && _textPassword.text != "") {
+      // منطق إضافة المدرب
     } else {
-      var Uti = new Utils();
-      Uti.showMyDialog(context, "Required", "First name, password, and email are required.");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('First name, password, and email are required.'),
+      ));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    Future insertUser(BuildContext context, String firstName, String lastName) async {
-      var url = "users/insertUser.php?firstName=" + firstName + "&lastName=" + lastName;
-      final response = await http.get(Uri.parse(serverPath + url));
-      setState(() {});
-      Navigator.pop(context);
-    }
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              "First name*:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              controller: _textFirstName,
-              decoration: InputDecoration(border: OutlineInputBorder(), hintText: ' First name'),
-            ),
-            Text(
-              "Last name:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              controller: _textLastName,
-              decoration: InputDecoration(border: OutlineInputBorder(), hintText: ' Last name'),
-            ),
-            Text(
-              "Email*:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              decoration: InputDecoration(border: OutlineInputBorder(), hintText: ' Email'),
-            ),
-            Text(
-              "Password*:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              controller: _textPassword,
-              decoration: InputDecoration(border: OutlineInputBorder(), hintText: ' Password'),
-            ),
-            SizedBox(height: 20),
-            TextButton(
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              // إدخال اسم المدرب
+              Text(
+                "First name*: ",
+                style: TextStyle(fontSize: 20),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                      const CoachCalendarScreen(title: "")),
-                );
-              },
-              child: Text('sign up'),
-            ),
+              TextField(
+                controller: _textFirstName,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'First name',
+                ),
+              ),
+              SizedBox(height: 10),
 
-          ],
+              // إدخال اسم العائلة
+              Text(
+                "Last name: ",
+                style: TextStyle(fontSize: 20),
+              ),
+              TextField(
+                controller: _textLastName,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Last name',
+                ),
+              ),
+              SizedBox(height: 10),
+
+              // إدخال البريد الإلكتروني
+              Text(
+                "Email*: ",
+                style: TextStyle(fontSize: 20),
+              ),
+              TextField(
+                controller: _textEmail,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Email',
+                ),
+              ),
+              SizedBox(height: 10),
+
+              // إدخال كلمة المرور
+              Text(
+                "Password*: ",
+                style: TextStyle(fontSize: 20),
+              ),
+              TextField(
+                controller: _textPassword,
+                obscureText: true,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Password',
+                ),
+              ),
+              SizedBox(height: 20),
+
+              // زر اختيار الصورة
+              GestureDetector(
+                onTap: _pickImage, // عند النقر على الصورة
+                child: Container(
+                  width: 150,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(75),
+                  ),
+                  child: _image == null
+                      ? Icon(
+                    Icons.camera_alt,
+                    size: 50,
+                    color: Colors.white,
+                  )
+                      : ClipOval(
+                    child: Image.file(
+                      _image!,
+                      fit: BoxFit.cover,
+                      width: 150,
+                      height: 150,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+
+              // زر التسجيل
+              TextButton(
+                style: ButtonStyle(
+                  foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                ),
+                onPressed: () {
+                  // منطق التسجيل هنا
+                  insertUserFunc();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CoachCalendarScreen(title: "")),
+                  );
+                },
+                child: Text('Sign Up'),
+              ),
+            ],
+          ),
         ),
       ),
     );
