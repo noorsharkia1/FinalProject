@@ -44,7 +44,17 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  @override
+  Future checkLogin(BuildContext context) async {
+
+    //   SharedPreferences prefs = await SharedPreferences.getInstance();
+    //  String? getInfoDeviceSTR = prefs.getString("getInfoDeviceSTR");
+    var url = "login/checkLogin.php?userName=" + userName+ "&password=" + password;
+    final response = await http.get(Uri.parse(serverPath+ url));
+    print(serverPath + url);
+    // setState(() { });
+    // Navigator.pop(context);
+
+    @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -87,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
               ),
-              onPressed: () {
+              onPressed: () { checkLogin(context);
                 Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const HomePageScreen(title: 'Home Page')));

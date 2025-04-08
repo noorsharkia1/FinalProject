@@ -36,15 +36,31 @@ class RegisterscreenPageState extends State<RegisterScreen> {
         client.lastName= _txtLastName.text;
         client.password = _txtPassword.text;
         client.email=_txtEmail.text;
-        // in
+        insertUser(context, firstName, lastName);
       }
     else
       {
         var Uti = new Utils();
         Uti.showMyDialog(context, "Required", "first name, password and email is required.");
       }
-
   }
+
+
+  Future insertUser(BuildContext context, Client client) async {
+
+    //   SharedPreferences prefs = await SharedPreferences.getInstance();
+    //  String? getInfoDeviceSTR = prefs.getString("getInfoDeviceSTR");
+    var url = "users/insertUser.php?firstName=" + client.firstName + "&lastName=" + client.lastName + "&email=" + client.email +
+              "&password=" + client.password + "&height=" + client.height + "&weight=" + client.weight + "&gender=" + client.gender;
+    final response = await http.get(Uri.parse(serverPath + url));
+    // print(serverPath + url);
+    setState(() { });
+    Navigator.pop(context);
+  }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -137,9 +153,11 @@ class RegisterscreenPageState extends State<RegisterScreen> {
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
               ),
               onPressed: () {
-              Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const HomePageScreen(title: '')));
+
+                insertUserFunc();
+              // Navigator.push(
+              // context,
+              // MaterialPageRoute(builder: (context) => const HomePageScreen(title: '')));
               },
 
               child: Text('Register'),

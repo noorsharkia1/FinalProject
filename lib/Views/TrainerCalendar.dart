@@ -46,7 +46,6 @@ class TrainerCalendarPageState extends State<TrainerCalendar> {
       "2:00 PM - Break and Relax",
       "4:00 PM - Staff Training",
     ],
-    // يمكنك إضافة المزيد من المهام لأيام أخرى هنا
   };
 
   @override
@@ -75,7 +74,7 @@ class TrainerCalendarPageState extends State<TrainerCalendar> {
                 scrollDirection: Axis.horizontal,
                 itemCount: 30, // عرض 30 يومًا للأمام من تاريخ اليوم
                 itemBuilder: (context, index) {
-                  DateTime date = _selectedDate.subtract(Duration(days: index));
+                  DateTime date = DateTime.now().add(Duration(days: index));
                   return GestureDetector(
                     onTap: () {
                       setState(() {
@@ -142,16 +141,22 @@ class TrainerCalendarPageState extends State<TrainerCalendar> {
               shrinkWrap: true,
               itemCount: _tasksForDate[_selectedDate]!.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(_tasksForDate[_selectedDate]![index]),
+                return Card(
+                  margin: EdgeInsets.symmetric(vertical: 5),
+                  elevation: 5,
+                  child: ListTile(
+                    title: Text(
+                      _tasksForDate[_selectedDate]![index],
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
                 );
               },
             )
                 : Center(child: Text('No tasks for this day')),
           ],
         ),
-      ),
+      )
     );
   }
 }
-
