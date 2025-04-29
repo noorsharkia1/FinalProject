@@ -1,8 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class TrainerProfile extends StatefulWidget {
   const TrainerProfile({super.key, required this.title});
-
   final String title;
 
   @override
@@ -14,82 +14,176 @@ class TrainerProfilePageState extends State<TrainerProfile> {
   final TextEditingController _lastNameController = TextEditingController(text: "المهندس");
   final TextEditingController _emailController = TextEditingController(text: "ahmed@example.com");
   final TextEditingController _passwordController = TextEditingController(text: "password123");
+  final TextEditingController _weightController = TextEditingController(text: "75");
+  final TextEditingController _heightController = TextEditingController(text: "175");
 
   String _gender = 'male';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+      backgroundColor: const Color(0xFFEAF4F3),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // محتوى الصفحة
+            Padding(
+              padding: const EdgeInsets.all(22.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 30),
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E1F28),
+                      letterSpacing: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        _buildGlassField("First Name*", _firstNameController, 'Enter first name'),
+                        _buildGlassField("Last Name*", _lastNameController, 'Enter last name'),
+                        _buildGlassField("Email*", _emailController, 'Enter email'),
+                        _buildGlassField("Password*", _passwordController, 'Enter password', isPassword: true),
+                        _buildGlassField("Weight (kg)*", _weightController, 'Enter weight'),
+                        _buildGlassField("Height (cm)*", _heightController, 'Enter height'),
+                        const SizedBox(height: 15),
+                        _buildGlassDropdown(),
+                        const SizedBox(height: 30),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (_firstNameController.text.isNotEmpty &&
+                                  _lastNameController.text.isNotEmpty &&
+                                  _emailController.text.isNotEmpty &&
+                                  _passwordController.text.isNotEmpty &&
+                                  _weightController.text.isNotEmpty &&
+                                  _heightController.text.isNotEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Profile updated successfully!')),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('All fields are required!')),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF2E8B8B),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 16),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              elevation: 8,
+                            ),
+                            child: const Text(
+                              'Update Profile',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          child: ListView(
+    );
+  }
+
+  Widget _buildGlassField(String label, TextEditingController controller, String hint,
+      {bool isPassword = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 22.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.teal.withOpacity(0.1)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.teal.withOpacity(0.1),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
+                )
+              ],
+            ),
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1E1F28),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: controller,
+                  obscureText: isPassword,
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    hintStyle: TextStyle(color: Colors.grey.shade600),
+                    border: InputBorder.none,
+                  ),
+                  style: const TextStyle(color: Color(0xFF1E1F28)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGlassDropdown() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.teal.withOpacity(0.1)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.teal.withOpacity(0.1),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              )
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // First Name
-              Text(
-                "First name*:",
-                style: TextStyle(fontSize: 20),
-              ),
-              TextField(
-                controller: _firstNameController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter first name',
-                ),
-              ),
-
-              // Last Name
-              Text(
-                "Last name*:",
-                style: TextStyle(fontSize: 20),
-              ),
-              TextField(
-                controller: _lastNameController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter last name',
-                ),
-              ),
-
-              // Email
-              Text(
-                "Email*:",
-                style: TextStyle(fontSize: 20),
-              ),
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter email',
-                ),
-              ),
-
-              // Password
-              Text(
-                "Password*:",
-                style: TextStyle(fontSize: 20),
-              ),
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter password',
-                ),
-              ),
-
-              // Gender
-              Text(
+              const Text(
                 "Gender*:",
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1E1F28),
+                ),
               ),
+              const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 value: _gender,
-                items: [
+                items: const [
                   DropdownMenuItem(child: Text('Male'), value: 'male'),
                   DropdownMenuItem(child: Text('Female'), value: 'female'),
                 ],
@@ -98,32 +192,9 @@ class TrainerProfilePageState extends State<TrainerProfile> {
                     _gender = value!;
                   });
                 },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
-              // Save Button
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Validate inputs and show a confirmation message
-                    if (_firstNameController.text.isNotEmpty &&
-                        _lastNameController.text.isNotEmpty &&
-                        _emailController.text.isNotEmpty &&
-                        _passwordController.text.isNotEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Profile updated successfully!')),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('All fields are required!')),
-                      );
-                    }
-                  },
-                  child: Text('Update Profile'),
-                ),
+                decoration: const InputDecoration.collapsed(hintText: ''),
+                style: const TextStyle(color: Color(0xFF1E1F28)),
+                dropdownColor: Colors.white.withOpacity(0.95),
               ),
             ],
           ),

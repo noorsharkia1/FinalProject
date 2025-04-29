@@ -1,8 +1,11 @@
-import 'package:finalproject/Views/CvsT.dart';
-import 'package:finalproject/Views/EditedProfile.dart';
-import 'package:finalproject/Views/HomePage.dart';
-import 'package:finalproject/Views/RegisterScreen.dart';
+import 'package:finalproject/Views/CoachCalendar.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+// شاشات ثانية (تأكد إنهم موجودين عندك)
+import 'package:finalproject/Views/HomePage.dart';
+import 'package:finalproject/Views/EditedProfile.dart';
+import 'package:finalproject/Views/RegisterScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Noor Sharkia '),
+      home: const MyHomePage(title: 'Noor Sharkia'),
     );
   }
 }
@@ -34,114 +37,136 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  // تعاريف مهمة
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
-  get child => null;
+  final String serverPath = "http://yourserver.com/"; // غيّر الرابط حسب السيرفر تبعك
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  // دالة تسجيل الدخول
+  Future<void> checkLogin(BuildContext context) async {
+    String email = emailController.text;
+    String password = passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text("خطأ"),
+          content: Text("يرجى إدخال البريد وكلمة المرور"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("حسنًا"),
+            )
+          ],
+        ),
+      );
+      return;
+    }
+
+    var url = "login/checkLogin.php?email=$email&password=$password";
+
+    try {
+      final response = await http.get(Uri.parse(serverPath + url));
+      print("API URL: ${serverPath + url}");
+      print("Response: ${response.body}");
+
+      if (response.statusCode == 200) {
+        // هون ممكن تعمل فحص على البيانات الراجعة لو بدك
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (context) =>
+        //       const HomePageScreen(title: 'Home Page')),
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                  const CoachCalendarScreen(title: 'Home Page')),
+            );
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text("خطأ"),
+            content: Text("فشل تسجيل الدخول"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("موافق"),
+              )
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 
-  Future checkLogin(BuildContext context) async {
-
-    //   SharedPreferences prefs = await SharedPreferences.getInstance();
-    //  String? getInfoDeviceSTR = prefs.getString("getInfoDeviceSTR");
-    var url = "login/checkLogin.php?userName=" + userName+ "&password=" + password;
-    final response = await http.get(Uri.parse(serverPath+ url));
-    print(serverPath + url);
-    // setState(() { });
-    // Navigator.pop(context);
-
-    @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
         title: IconButton(
           icon: Icon(Icons.person),
           color: Colors.purple,
-          splashColor: Colors.white,
           iconSize: 36.0,
-          padding: EdgeInsets.all(8.0),
           onPressed: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const EditedProfile(title: 'Edited Profile'))
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                  const EditedProfile(title: 'Edited Profile')),
             );
           },
         ),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              "Email:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: ' Email'),
-            ),
-            Text(
-              "Password:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: ' Password'),
-            ),
-            TextButton(
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            children: <Widget>[
+              Text(
+                "Email:",
+                style: TextStyle(fontSize: 20),
               ),
-              onPressed: () { checkLogin(context);
-                Navigator.push(
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(), hintText: 'Email'),
+              ),
+              SizedBox(height: 16),
+              Text(
+                "Password:",
+                style: TextStyle(fontSize: 20),
+              ),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(), hintText: 'Password'),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => checkLogin(context),
+                child: Text('Login'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const HomePageScreen(title: 'Home Page')));
-
-              },
-              child: Text('login'),
-            ),
-            TextButton(
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          const CvsTScreen(title: "new account")),
-                );
-              },
-              child: Text('create new account'),
-            ),
-
-            /*TextButton(
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-              ),
-
-              child: Text('Home Page'),
-            ),*/
-
-           /* TextButton(
-                child: Icon(Icons.remove_red_eye_rounded),
-                onPressed: () => showDialog(context: context, builder: (BuildContext context){
-                  return AlertDialog(
-                    content: Text("Whatever Widget"),
+                    MaterialPageRoute(
+                        builder: (context) =>
+                        const RegisterScreen(title: "New Account")),
                   );
-                })
-            )*/
-
-
-
-
-            
-          ],
+                },
+                child: Text('Create New Account'),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,120 +1,136 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:finalproject/Views/TrainerProfile.dart';
-import 'package:finalproject/Views/TrainerCalendar.dart';
 import 'package:finalproject/Views/CoachList.dart';
-class HomePageScreen extends StatefulWidget {
-  const HomePageScreen({super.key, required this.title});
+import 'package:finalproject/Views/TrainerCalendar.dart'; // تأكد من إضافة هذا الاستيراد
 
+class HomePageScreen extends StatelessWidget {
   final String title;
 
-  @override
-  State<HomePageScreen> createState() => HomePageScreenPageState();
-}
-
-class HomePageScreenPageState extends State<HomePageScreen> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  const HomePageScreen({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // خلفية الصفحة باللون الليلكي الفاتح
-      backgroundColor: Color(0xFFD1C4E9), // لون الليلكي الفاتح
-      appBar: AppBar(
-        backgroundColor: Color(0xFF9575CD), // خلفية الشريط العلوي باللون الليلكي الداكن
-        title: Text(
-          widget.title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-            color: Colors.white,
+      body: Stack(
+        children: [
+          // الخلفية
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1E1F28), Color(0xFFA3E4DB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
           ),
-        ),
-        elevation: 0,
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              // زر Calendar
-              _buildCustomButton('Calendar', Color(0xFF9575CD), Icons.calendar_today, onPressed: () {
-                // الانتقال إلى صفحة TrainerCalendar عند الضغط على الزر Calendar
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TrainerCalendar(title: "Trainer Calendar")),
-                );
-              }),
-              SizedBox(height: 20),
 
-              // زر Profile
-              _buildCustomButton('Profile', Color(0xFFAB8EE8), Icons.account_circle, onPressed: () {
-                // الانتقال إلى صفحة TrainerProfile
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TrainerProfile(title: "Trainer Profile")),
-                );
-              }),
-              SizedBox(height: 20),
+          // المحتوى
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 40),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 50),
 
-              // زر Coach
-              _buildCustomButton('Coach', Color(0xFFE1BEE7), Icons.add, onPressed: () {
-                // الانتقال إلى صفحة CoachList عند الضغط على الزر Coach
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CoachList(title: "Coach List")),
-                );
-              }),
-            ],
+                  // زر Calendar
+                  _buildGlassCard(
+                    icon: Icons.calendar_today,
+                    label: 'Calendar',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TrainerCalendar(title: "Trainer Calendar"),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+
+                  // زر Profile
+                  _buildGlassCard(
+                    icon: Icons.account_circle,
+                    label: 'Profile',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TrainerProfile(title: "Trainer Profile"),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+
+                  // زر Coach
+                  _buildGlassCard(
+                    icon: Icons.group,
+                    label: 'Coach',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CoachList(title: "Coach List"),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  // دالة لبناء الأزرار بتنسيق حديث وكبير
-  Widget _buildCustomButton(String label, Color color, IconData icon, {VoidCallback? onPressed}) {
-    return ElevatedButton(
-      onPressed: onPressed ?? () {
-        // هنا يمكنك إضافة المنطق الذي تود تنفيذه عند الضغط على الزر
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color, // الخلفية
-        padding: EdgeInsets.symmetric(horizontal: 80, vertical: 25),  // تكبير حجم الأزرار
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(35), // حواف دائرية أكثر بروزًا
-        ),
-        elevation: 10, // إضافة تأثير الظل أكبر قليلاً
-        textStyle: TextStyle(
-          fontSize: 20, // تكبير الخط داخل الزر
-          fontWeight: FontWeight.bold,  // جعل النص أكثر وضوحًا
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: Colors.white,
-            size: 35,  // تكبير الأيقونة داخل الزر
-          ),
-          SizedBox(width: 15), // زيادة المسافة بين الأيقونة والنص
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 20, // تكبير الخط داخل الزر
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+  Widget _buildGlassCard({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 25),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, color: Colors.white, size: 30),
+                const SizedBox(width: 20),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                )
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
