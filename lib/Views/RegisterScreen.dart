@@ -1,10 +1,8 @@
-import 'package:finalproject/Models/Client.dart';
+import 'dart:ui';
 import 'package:finalproject/Utils/ClientConfig.dart';
-import 'package:finalproject/Utils/utils.dart';
-import 'package:finalproject/main.dart';
 import 'package:flutter/material.dart';
+import 'package:finalproject/Views/TrainerCalendar.dart'; // تأكد من المسار
 import 'package:http/http.dart' as http;
-import 'package:finalproject/Views/HomePage.dart';
 
 
 class RegisterScreen extends StatefulWidget {
@@ -13,49 +11,39 @@ class RegisterScreen extends StatefulWidget {
   final String title;
 
   @override
-  State<RegisterScreen> createState() => RegisterscreenPageState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class RegisterscreenPageState extends State<RegisterScreen> {
-  final TextEditingController _textFirstName = new TextEditingController();
-  final TextEditingController _textLastName = new TextEditingController();
-  final TextEditingController _textPassword = new TextEditingController();
+class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController _textFirstName = TextEditingController();
+  final TextEditingController _textLastName = TextEditingController();
+  final TextEditingController _textEmail = TextEditingController();
+  final TextEditingController _textPassword = TextEditingController();
+  final TextEditingController _textHeight = TextEditingController();
+  final TextEditingController _textWeight = TextEditingController();
+  final TextEditingController _textGender = TextEditingController();
 
-  var _txtFirstName= new TextEditingController();
-  var _txtLastName= new TextEditingController();
-  var _txtPassword = new TextEditingController();
-  var _txtEmail = new TextEditingController();
-
-  
-  void insertUserFunc()
-  {
-    if(_txtFirstName.text != "" && _txtEmail.text != ""  && _textPassword.text != "")
-      {
-        var client = new Client();
-        client.firstName = _txtFirstName.text;
-        client.lastName= _txtLastName.text;
-        client.password = _txtPassword.text;
-        client.email=_txtEmail.text;
-        insertUser(context, firstName, lastName);
-      }
-    else
-      {
-        var Uti = new Utils();
-        Uti.showMyDialog(context, "Required", "first name, password and email is required.");
-      }
-  }
-
-
-  Future insertUser(BuildContext context, Client client) async {
+  // ✅ الزر بس ينضغط بيروح مباشرة للصفحة المطلوبة
+  Future insertUserFunc(BuildContext context) async {
 
     //   SharedPreferences prefs = await SharedPreferences.getInstance();
     //  String? getInfoDeviceSTR = prefs.getString("getInfoDeviceSTR");
-    var url = "users/insertUser.php?firstName=" + client.firstName + "&lastName=" + client.lastName + "&email=" + client.email +
-              "&password=" + client.password + "&height=" + client.height + "&weight=" + client.weight + "&gender=" + client.gender;
+
+    var url = "users/insertUser.php?firstName=" + _textFirstName.text + "&lastName=" + _textLastName.text + "&email=" + _textEmail.text +
+    "&password=" + _textPassword.text + "&height=" + _textHeight.text + "&weight=" + _textWeight.text;
     final response = await http.get(Uri.parse(serverPath + url));
-    // print(serverPath + url);
+    print(serverPath + url);
     setState(() { });
     Navigator.pop(context);
+
+
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const TrainerCalendar(title: "Trainer Calendar"),
+      ),
+    );
   }
 
 
@@ -64,106 +52,117 @@ class RegisterscreenPageState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-
-    Future insertUser(BuildContext context, String firstName, String lastName) async {
-      //   SharedPreferences prefs = await SharedPreferences.getInstance();
-      //  String? getInfoDeviceSTR = prefs.getString("getInfoDeviceSTR");
-      var url = "users/insertUser.php?firstName=" + firstName + "&lastName=" + lastName;
-      final response = await http.get(Uri.parse(serverPath + url));
-      // print(serverPath + url);
-      setState(() { });
-      Navigator.pop(context);
-    }
-
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              "First name*:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              controller: _textFirstName,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: ' First name'),
-            ),
-            Text(
-              "Last name:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              controller: _textLastName,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: ' Last name'),
-            ),
-            Text(
-              "Email*:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: ' Email'),
-            ),
-            Text(
-              "Password*:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              controller: _textPassword,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: ' Password'),
-            ),
-            Text(
-              "height:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              controller: _textPassword,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: ' height'),
-            ),
-            Text(
-              "weight:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              controller: _textPassword,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: ' weight'),
-            ),
-            Text(
-              "Gender:",
-              style: TextStyle(fontSize: 20),
-            ),
-            TextField(
-              controller: _textPassword,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: ' Gender'),
-            ),
-
-            TextButton(
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1E1F28), Color(0xFFA3E4DB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              onPressed: () {
-
-                insertUserFunc();
-              // Navigator.push(
-              // context,
-              // MaterialPageRoute(builder: (context) => const HomePageScreen(title: '')));
-              },
-
-              child: Text('Register'),
             ),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  _glassField("First Name*", _textFirstName),
+                  const SizedBox(height: 16),
+                  _glassField("Last Name", _textLastName),
+                  const SizedBox(height: 16),
+                  _glassField("Email*", _textEmail),
+                  const SizedBox(height: 16),
+                  _glassField("Password*", _textPassword, obscure: true),
+                  const SizedBox(height: 16),
+                  _glassField("Height", _textHeight),
+                  const SizedBox(height: 16),
+                  _glassField("Weight", _textWeight),
+                  const SizedBox(height: 16),
+                  // _glassField("Gender", _textGender),
+                  // const SizedBox(height: 30),
+                  _glassButton(),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-          ],
+  Widget _glassField(String hint, TextEditingController controller, {bool obscure = false}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
+          ),
+          child: TextField(
+            controller: controller,
+            obscureText: obscure,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: const TextStyle(color: Colors.white70),
+              border: InputBorder.none,
+              contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _glassButton() {
+    return GestureDetector(
+      onTap: (){
+        insertUserFunc(context);
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
+            ),
+            child: const Center(
+              child: Text(
+                "Register",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.1,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );

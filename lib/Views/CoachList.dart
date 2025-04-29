@@ -1,8 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class CoachList extends StatefulWidget {
   const CoachList({super.key, required this.title});
-
   final String title;
 
   @override
@@ -17,9 +17,7 @@ class CoachListState extends State<CoachList> {
   int _selectedTrainerAge = 30;
   String _selectedTrainerLocation = "New York";
 
-  // هذه بيانات المدربين تأتي من قاعدة البيانات (على سبيل المثال)
   Future<List<Map<String, String>>> getTrainers() async {
-    // استبدل هذا الكود بعملية جلب البيانات من قاعدة البيانات.
     return [
       {
         'name': 'John Doe',
@@ -56,70 +54,30 @@ class CoachListState extends State<CoachList> {
     ];
   }
 
-  void _onSelectTrainer(Map<String, String> trainer) {
-    setState(() {
-      _selectedTrainerName = trainer['name']!;
-      _selectedTrainerImage = trainer['image']!;
-      _selectedTrainerFirstName = trainer['firstName']!;
-      _selectedTrainerLastName = trainer['lastName']!;
-      _selectedTrainerAge = int.parse(trainer['age']!);
-      _selectedTrainerLocation = trainer['location']!;
-    });
-  }
-
   void _showTrainerDetailsPopup(Map<String, String> trainer) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return AlertDialog(
+          backgroundColor: Colors.white.withOpacity(0.95),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(trainer['name']!),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
+            children: [
               Text('Age: ${trainer['age']}'),
               Text('Location: ${trainer['location']}'),
             ],
           ),
-          actions: <Widget>[
+          actions: [
             TextButton(
               child: Text("Close"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
               child: Text("Join"),
               onPressed: () {
-                Navigator.of(context).pop();
-                _showConfirmationDialog(trainer);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showConfirmationDialog(Map<String, String> trainer) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Are you sure?"),
-          content: Text(
-              "Are you sure you want to unsubscribe from your current trainer and join ${trainer['name']}?"),
-          actions: <Widget>[
-            TextButton(
-              child: Text("Cancel"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text("Yes"),
-              onPressed: () {
-                Navigator.of(context).pop();
                 setState(() {
                   _selectedTrainerName = trainer['name']!;
                   _selectedTrainerImage = trainer['image']!;
@@ -128,6 +86,7 @@ class CoachListState extends State<CoachList> {
                   _selectedTrainerAge = int.parse(trainer['age']!);
                   _selectedTrainerLocation = trainer['location']!;
                 });
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -139,91 +98,105 @@ class CoachListState extends State<CoachList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(widget.title),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
-      body: FutureBuilder<List<Map<String, String>>>(
-        future: getTrainers(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-
-          final trainers = snapshot.data!;
-
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  // صورة المدرب الحالي في الأعلى
-                  CircleAvatar(
-                    radius: 80,
-                    backgroundImage: AssetImage(_selectedTrainerImage),
-                  ),
-                  SizedBox(height: 20),
-
-                  // تفاصيل المدرب الحالي
-                  Text(
-                    '$_selectedTrainerFirstName $_selectedTrainerLastName',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    'Age: $_selectedTrainerAge',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
-                  ),
-                  Text(
-                    'Location: $_selectedTrainerLocation',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
-                  ),
-                  SizedBox(height: 30),
-
-                  // المدربين الآخرين
-                  Text(
-                    'Other Trainers:',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 10),
-
-                  // عرض صور المدربين الآخرين بشكل أفقي
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: trainers.map((trainer) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: GestureDetector(
-                            onTap: () => _showTrainerDetailsPopup(trainer),
-                            child: Column(
-                              children: [
-                                CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage: AssetImage(trainer['image']!),
-                                ),
-                                SizedBox(height: 8),
-                                // اسم المدرب
-                                Text(
-                                  trainer['name']!, // عرض الاسم فقط
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                                  textAlign: TextAlign.center, // محاذاة النص في المنتصف
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
+      body: Stack(
+        children: [
+          // خلفية بتدرج لوني ناعم
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFE0F7FA), Color(0xFFE3F2FD)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
-          );
-        },
+          ),
+
+          // محتوى الصفحة مع تأثير زجاجي
+          FutureBuilder<List<Map<String, String>>>(
+            future: getTrainers(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting)
+                return Center(child: CircularProgressIndicator());
+
+              if (snapshot.hasError)
+                return Center(child: Text('Error: ${snapshot.error}'));
+
+              final trainers = snapshot.data!;
+
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 100, 16, 16),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(color: Colors.white.withOpacity(0.2)),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircleAvatar(
+                              radius: 60,
+                              backgroundImage: AssetImage(_selectedTrainerImage),
+                            ),
+                            SizedBox(height: 20),
+                            Text(
+                              '$_selectedTrainerFirstName $_selectedTrainerLastName',
+                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
+                            ),
+                            Text('Age: $_selectedTrainerAge', style: TextStyle(fontSize: 16, color: Colors.grey[700])),
+                            Text('Location: $_selectedTrainerLocation', style: TextStyle(fontSize: 16, color: Colors.grey[700])),
+                            SizedBox(height: 30),
+                            Text('Choose Another Trainer', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
+                            SizedBox(height: 10),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: trainers.map((trainer) {
+                                  return GestureDetector(
+                                    onTap: () => _showTrainerDetailsPopup(trainer),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      child: Column(
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 35,
+                                            backgroundImage: AssetImage(trainer['image']!),
+                                          ),
+                                          SizedBox(height: 6),
+                                          Text(
+                                            trainer['name']!,
+                                            style: TextStyle(fontSize: 14, color: Colors.black),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
