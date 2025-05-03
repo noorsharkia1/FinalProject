@@ -153,7 +153,7 @@ class CoachRegisterPageState extends State<CoachRegister> {
                   insertUserFunc();
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const CoachCalendarScreen(title: "")),
+                    MaterialPageRoute(builder: (context) => const CoachCalendarScreen()),
                   );
                 },
                 child: Text('Sign Up'),

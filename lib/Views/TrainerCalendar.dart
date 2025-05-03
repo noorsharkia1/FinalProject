@@ -1,6 +1,8 @@
 import 'package:finalproject/Utils/ClientConfig.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:finalproject/Views/CoachList.dart' as myViews;
+import 'package:finalproject/Views/TrainerProfile.dart';
 import 'package:http/http.dart' as http;
 
 class TrainerCalendar extends StatefulWidget {
@@ -11,14 +13,16 @@ class TrainerCalendar extends StatefulWidget {
   @override
   State<TrainerCalendar> createState() => _TrainerCalendarState();
 }
+
 final TextEditingController _textstartDate = TextEditingController();
 final TextEditingController _text = TextEditingController();
-
 
 class _TrainerCalendarState extends State<TrainerCalendar>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+
+  int _selectedIndex = 1;
 
   final List<Map<String, String>> trainings = [
     {"title": "Full Body Workout", "time": "Monday • 6:00 PM"},
@@ -48,8 +52,30 @@ class _TrainerCalendarState extends State<TrainerCalendar>
     super.dispose();
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const TrainerProfile(title: '',)),
+        );
+        break;
+      case 1:
+        break; // Stay on current page
+    //   case 2:
+    //     Navigator.push(
+    //       context,
+    //       MaterialPageRoute(builder: (context) => const myViews.CoachList(title: '',)),
+    // );
+        break;
+    }
+  }
+
   DateTime _parseTrainingTime(String timeStr) {
-    print("timeStr:" + timeStr);
     final parts = timeStr.split(' • ');
     final day = parts[0];
     final time = parts[1];
@@ -82,17 +108,11 @@ class _TrainerCalendarState extends State<TrainerCalendar>
   }
 
   Future insertUser(BuildContext context, DateTime startDateTime) async {
-
-    //   SharedPreferences prefs = await SharedPreferences.getInstance();
-    //  String? getInfoDeviceSTR = prefs.getString("getInfoDeviceSTR");
-    var url = "${serverPath}calendarEvents/insertCalendarEvent.php?userID=0&userID=0&startDateTime=" + startDateTime.toString();
-    final response = await http.get(Uri.parse(serverPath + url));
+    var url = "${serverPath}calendarEvents/insertCalendarEvent.php?userID=0&startDateTime=" + startDateTime.toString();
+    url = url.replaceAll(" ", "-");
+    final response = await http.get(Uri.parse(url));
     print(url);
-    // print(serverPath + url);
-
   }
-
-
 
   void _deleteTraining(int index) async {
     final confirm = await showDialog<bool>(
@@ -156,7 +176,6 @@ class _TrainerCalendarState extends State<TrainerCalendar>
                 onTap: () {
                   setState(() {
                     trainings.add({"title": "Custom Training", "time": date});
-
                     insertUser(context, DateTime.now());
                   });
                   Navigator.pop(context);
@@ -330,6 +349,27 @@ class _TrainerCalendarState extends State<TrainerCalendar>
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.teal,
+        unselectedItemColor: Colors.grey,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Calendar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.group),
+            label: 'Coaches',
+          ),
+        ],
       ),
     );
   }

@@ -26,17 +26,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // ✅ الزر بس ينضغط بيروح مباشرة للصفحة المطلوبة
   Future insertUserFunc(BuildContext context) async {
 
-    //   SharedPreferences prefs = await SharedPreferences.getInstance();
-    //  String? getInfoDeviceSTR = prefs.getString("getInfoDeviceSTR");
-
     var url = "users/insertUser.php?firstName=" + _textFirstName.text + "&lastName=" + _textLastName.text + "&email=" + _textEmail.text +
     "&password=" + _textPassword.text + "&height=" + _textHeight.text + "&weight=" + _textWeight.text;
     final response = await http.get(Uri.parse(serverPath + url));
     print(serverPath + url);
     setState(() { });
     Navigator.pop(context);
-
-
 
     Navigator.pushReplacement(
       context,

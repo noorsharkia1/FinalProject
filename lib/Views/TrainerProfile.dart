@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:finalproject/Views/TrainerCalendar.dart';
+import 'package:finalproject/Views/CoachList.dart' as myViews;
 
 class TrainerProfile extends StatefulWidget {
   const TrainerProfile({super.key, required this.title});
@@ -18,6 +20,31 @@ class TrainerProfilePageState extends State<TrainerProfile> {
   final TextEditingController _heightController = TextEditingController(text: "175");
 
   String _gender = 'male';
+  int _selectedIndex = 0;
+
+  // Method to handle BottomNavigationBar tap
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        break; // Stay on the current page (TrainerProfile)
+      case 1:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const TrainerCalendar(title: 'Trainer Calendar')),
+        );
+        break;
+      case 2:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const CoachList(title: '',)),
+        );
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +121,27 @@ class TrainerProfilePageState extends State<TrainerProfile> {
             ),
           ],
         ),
+      ),
+      // الشريط السفلي (BottomNavigationBar)
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        selectedItemColor: Colors.teal,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Calendar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.group),
+            label: 'Coaches',
+          ),
+        ],
       ),
     );
   }

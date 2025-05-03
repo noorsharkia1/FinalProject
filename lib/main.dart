@@ -1,3 +1,8 @@
+import 'dart:convert';
+
+import 'package:finalproject/Models/CheckLoggingModel.dart';
+import 'package:finalproject/Utils/ClientConfig.dart';
+import 'package:finalproject/Utils/utils.dart';
 import 'package:finalproject/Views/CoachCalendar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -6,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:finalproject/Views/HomePage.dart';
 import 'package:finalproject/Views/EditedProfile.dart';
 import 'package:finalproject/Views/RegisterScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,8 +46,9 @@ class _MyHomePageState extends State<MyHomePage> {
   // تعاريف مهمة
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  String? _selectedType = 'Coach'; // القيمة الابتدائية
+  final List<String> _types = ['Coach', 'Trainer'];
 
-  final String serverPath = "http://yourserver.com/"; // غيّر الرابط حسب السيرفر تبعك
 
   // دالة تسجيل الدخول
   Future<void> checkLogin(BuildContext context) async {
@@ -62,48 +69,79 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       );
-      return;
     }
+    else
+      {
+        var url = "";
+        if(_selectedType == "Coach")
+          {
+             url = "login/checkLoginCoach.php?email=$email&password=$password";
+          }
+        else
+          {
+             url = "login/checkLogin.php?email=$email&password=$password";
+          }
 
-    var url = "login/checkLogin.php?email=$email&password=$password";
+        try {
+          final response = await http.get(Uri.parse(serverPath + url));
+          print("API URL: ${serverPath + url}");
+          print("Response: ${response.body}");
 
-    try {
-      final response = await http.get(Uri.parse(serverPath + url));
-      print("API URL: ${serverPath + url}");
-      print("Response: ${response.body}");
+          if (response.statusCode == 200) {
 
-      if (response.statusCode == 200) {
-        // هون ممكن تعمل فحص على البيانات الراجعة لو بدك
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //       builder: (context) =>
-        //       const HomePageScreen(title: 'Home Page')),
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                  const CoachCalendarScreen(title: 'Home Page')),
+            if(checkLoginModel.fromJson(jsonDecode(response.body)).userID == 0)
+            {
+              Utils uti = new Utils();
+              uti.showMyDialog(context, "Error", "your email or password is wrong");
+            }
+            else
+            {
+              // print("SharedPreferences 1");
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.setString('token', checkLoginModel.fromJson(jsonDecode(response.body)).userID!);
+              await prefs.setString('gender', checkLoginModel.fromJson(jsonDecode(response.body)).gender!);
+              await prefs.setString('firstName', checkLoginModel.fromJson(jsonDecode(response.body)).firstName!);
+              if(_selectedType == "Coach")
+              {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                      const CoachCalendarScreen()),
+                );
+              }
+              else
+                {
+                  // هون ممكن تعمل فحص على البيانات الراجعة لو بدك
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                        const HomePageScreen(title: 'Home Page')));
+                }
+            }
+          }
+          else {
+            showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                title: Text("خطأ"),
+                content: Text("فشل تسجيل الدخول"),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text("موافق"),
+                  )
+                ],
+              ),
             );
-      } else {
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text("خطأ"),
-            content: Text("فشل تسجيل الدخول"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text("موافق"),
-              )
-            ],
-          ),
-        );
+          }
+        } catch (e) {
+          print("Error: $e");
+        }
+
       }
-    } catch (e) {
-      print("Error: $e");
-    }
+
   }
 
   @override
@@ -129,6 +167,33 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: EdgeInsets.all(20),
           child: Column(
             children: <Widget>[
+              Text(
+                "Type:",
+                style: TextStyle(fontSize: 20),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: 'User Type',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  value: _selectedType,
+                  items: _types.map((type) {
+                    return DropdownMenuItem(
+                      value: type,
+                      child: Text(type),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedType = value;
+                    });
+                  },
+                ),
+              ),
+
+
               Text(
                 "Email:",
                 style: TextStyle(fontSize: 20),

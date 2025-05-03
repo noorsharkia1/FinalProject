@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:finalproject/Views/TrainerProfile.dart';
-import 'package:finalproject/Views/CoachList.dart';
+import 'package:finalproject/Views/CoachList.dart'as myViews;
 import 'package:finalproject/Views/TrainerCalendar.dart'; // تأكد من إضافة هذا الاستيراد
 
 class HomePageScreen extends StatelessWidget {
