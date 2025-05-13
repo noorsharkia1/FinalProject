@@ -1,17 +1,17 @@
 import 'dart:convert';
-
-import 'package:finalproject/Models/CheckLoggingModel.dart';
+import 'package:finalproject/Models/checkLoginModel.dart';
 import 'package:finalproject/Utils/ClientConfig.dart';
 import 'package:finalproject/Utils/utils.dart';
 import 'package:finalproject/Views/CoachCalendar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 // شاشات ثانية (تأكد إنهم موجودين عندك)
 import 'package:finalproject/Views/HomePage.dart';
 import 'package:finalproject/Views/EditedProfile.dart';
 import 'package:finalproject/Views/RegisterScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+
 
 void main() {
   runApp(const MyApp());
@@ -103,12 +103,18 @@ class _MyHomePageState extends State<MyHomePage> {
               await prefs.setString('firstName', checkLoginModel.fromJson(jsonDecode(response.body)).firstName!);
               if(_selectedType == "Coach")
               {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //       builder: (context) =>
+                //       const CoachCalendarScreen()),
+                // );
+
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                      const CoachCalendarScreen()),
-                );
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                        const HomePageScreen(title: 'Home Page')));
               }
               else
                 {

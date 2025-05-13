@@ -3,12 +3,11 @@
 class User
 {
   User({
-
-  this.gainWeightFullBody= "",
-  this.gainWeightLowerBody= "",
-  this.gainWeightUpperBody= "",
-  this.loseWeightFullBody= "",
-  this.loseWeightLowerBody= "",
+  this.gainWeightFullBody="",
+  this.gainWeightLowerBody="",
+  this.gainWeightUpperBody="",
+  this.loseWeightFullBody="",
+  this.loseWeightLowerBody="",
     this.loseWeightUpperBody="",
 
 });
