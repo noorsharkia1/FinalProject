@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'package:finalproject/Models/checkLoginModel.dart';
 import 'package:finalproject/Utils/ClientConfig.dart';
 import 'package:finalproject/Utils/utils.dart';
-import 'package:finalproject/Views/CoachCalendar.dart';
+import 'package:finalproject/Views/CoachViews/CoachCalendar.dart';
+import 'package:finalproject/Views/TrainerViews/TrainerCalendar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 // شاشات ثانية (تأكد إنهم موجودين عندك)
-import 'package:finalproject/Views/HomePage.dart';
-import 'package:finalproject/Views/EditedProfile.dart';
+// import 'package:finalproject/Views/HomePage.dart';
 import 'package:finalproject/Views/RegisterScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,12 +23,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Noor Sharkia',
+      title: '',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Noor Sharkia'),
+      home: const MyHomePage(title: ''),
     );
   }
 }
@@ -59,12 +59,12 @@ class _MyHomePageState extends State<MyHomePage> {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: Text("خطأ"),
-          content: Text("يرجى إدخال البريد وكلمة المرور"),
+          title: Text("Error"),
+          content: Text("Please make sure to enter your Email and Password correctly"),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("حسنًا"),
+              child: Text("ok"),
             )
           ],
         ),
@@ -119,11 +119,19 @@ class _MyHomePageState extends State<MyHomePage> {
               else
                 {
                   // هون ممكن تعمل فحص على البيانات الراجعة لو بدك
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //       builder: (context) =>
+                  //       const HomePageScreen(title: 'Home Page')));
+
                   Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                        const HomePageScreen(title: 'Home Page')));
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                          const TrainerCalendar(title: 'TrainerCalendar')));
+
+
                 }
             }
           }
@@ -131,12 +139,12 @@ class _MyHomePageState extends State<MyHomePage> {
             showDialog(
               context: context,
               builder: (_) => AlertDialog(
-                title: Text("خطأ"),
-                content: Text("فشل تسجيل الدخول"),
+                title: Text("Error"),
+                content: Text("Login failed, please try again "),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text("موافق"),
+                    child: Text("ok"),
                   )
                 ],
               ),
@@ -154,19 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: IconButton(
-          icon: Icon(Icons.person),
-          color: Colors.purple,
-          iconSize: 36.0,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                  const EditedProfile(title: 'Edited Profile')),
-            );
-          },
-        ),
+        title: Text("FitSync")
       ),
       body: Center(
         child: SingleChildScrollView(

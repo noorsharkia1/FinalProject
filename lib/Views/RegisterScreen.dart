@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:finalproject/Utils/ClientConfig.dart';
 import 'package:flutter/material.dart';
-import 'package:finalproject/Views/TrainerCalendar.dart'; // تأكد من المسار
+import 'package:finalproject/Views/TrainerViews/TrainerCalendar.dart'; // تأكد من المسار
 import 'package:http/http.dart' as http;
 
 
