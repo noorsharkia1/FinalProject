@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:finalproject/Views/TrainerCalendar.dart';
+import 'package:finalproject/Views/TrainerViews/TrainerCalendar.dart';
 // import 'package:finalproject/Views/CoachList.dart' as myViews;
 
 class TrainerProfile extends StatefulWidget {

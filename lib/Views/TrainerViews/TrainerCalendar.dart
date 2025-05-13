@@ -1,8 +1,8 @@
 import 'package:finalproject/Utils/ClientConfig.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
-import 'package:finalproject/Views/CoachList.dart' as myViews;
-import 'package:finalproject/Views/TrainerProfile.dart';
+import 'package:finalproject/Views/TrainerViews/CoachList.dart' as myViews;
+import 'package:finalproject/Views/TrainerViews/TrainerProfile.dart';
 import 'package:http/http.dart' as http;
 
 class TrainerCalendar extends StatefulWidget {
