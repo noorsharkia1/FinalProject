@@ -18,7 +18,7 @@ class checkLoginModel {
       userID: json['userID'],
       firstName: json['FirstName'],
       email: json['Email'],
-        gender: json['Gender'],
+      gender: json['Gender'],
 
     );
   }

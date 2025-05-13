@@ -103,18 +103,18 @@ class _MyHomePageState extends State<MyHomePage> {
               await prefs.setString('firstName', checkLoginModel.fromJson(jsonDecode(response.body)).firstName!);
               if(_selectedType == "Coach")
               {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) =>
-                //       const CoachCalendarScreen()),
-                // );
-
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                        const HomePageScreen(title: 'Home Page')));
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                      const CoachCalendarScreen()),
+                );
+
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) =>
+                //         const HomePageScreen(title: 'Home Page')));
               }
               else
                 {

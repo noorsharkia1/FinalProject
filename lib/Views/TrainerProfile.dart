@@ -38,10 +38,10 @@ class TrainerProfilePageState extends State<TrainerProfile> {
         );
         break;
       case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const CoachList(title: '',)),
-        );
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => const CoachList(title: '',)),
+        // );
         break;
     }
   }
