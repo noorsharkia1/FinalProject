@@ -23,6 +23,7 @@ class TrainerProfilePageState extends State<TrainerProfile> {
 
   String _gender = 'male';
   int _selectedIndex = 0;
+  late User _currUserDetails;
 
   // Method to handle BottomNavigationBar tap
   void _onItemTapped(int index) {
@@ -48,6 +49,29 @@ class TrainerProfilePageState extends State<TrainerProfile> {
     }
   }
 
+
+
+
+
+ Future<void> getDetails() async {
+
+
+   final SharedPreferences prefs = await SharedPreferences.getInstance();
+   final int? lastRecipeID = prefs.getInt('lastRecipeID');
+
+
+   var url = "users/getMyDetails.php?recipeID=$lastRecipeID";
+   final response = await http.get(Uri.parse(serverPath + url));
+   print(serverPath + url);
+   // Map<String, dynamic> i in json.decode(response.body)
+   _currUserDetails = User.fromJson(json.decode(response.body));
+   setState(() {
+   });
+ }
+
+
+
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
