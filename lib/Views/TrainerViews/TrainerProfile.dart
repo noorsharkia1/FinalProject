@@ -1,7 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:finalproject/Views/TrainerViews/TrainerCalendar.dart';
-// import 'package:finalproject/Views/CoachList.dart' as myViews;
+import 'package:http/http.dart' as http;
+
+
 
 class TrainerProfile extends StatefulWidget {
   const TrainerProfile({super.key, required this.title});
@@ -76,7 +78,7 @@ class TrainerProfilePageState extends State<TrainerProfile> {
                         _buildGlassField("First Name*", _firstNameController, 'Enter first name'),
                         _buildGlassField("Last Name*", _lastNameController, 'Enter last name'),
                         _buildGlassField("Email*", _emailController, 'Enter email'),
-                        _buildGlassField("Password*", _passwordController, 'Enter password', isPassword: true),
+                        // _buildGlassField("Password*", _passwordController, 'Enter password', isPassword: true),
                         _buildGlassField("Weight (kg)*", _weightController, 'Enter weight'),
                         _buildGlassField("Height (cm)*", _heightController, 'Enter height'),
                         const SizedBox(height: 15),

@@ -19,26 +19,7 @@ class CoachList extends StatefulWidget {
 
 class _CoachListState extends State<CoachList> {
    late List<Coach> _coaches;
-
-  // final List<Map<String, String>> coaches = [
-  //   {
-  //     "name": "Alaa Ahmad",
-  //     "Location": "Haifa",
-  //     "Price": "35"
-  //   },
-  //   {
-  //     "name": "Nour Hasan",
-  //     "Location": "Yafa",
-  //     "Price": "13"
-  //   },
-  //   {
-  //     "name": "Omar Zaid",
-  //     "Location": "Haifa",
-  //     "Price": "40"
-  //   },
-  // ];
-
-  int? primaryCoachIndex;
+   int? primaryCoachIndex;
 
 
    @override
@@ -67,9 +48,8 @@ class _CoachListState extends State<CoachList> {
 
 
 
-
    @override
-  Widget build(BuildContext context) {
+   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF6FAFA),
       body: SafeArea(
