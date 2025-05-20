@@ -31,6 +31,24 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
     ],
   };
 
+
+
+  
+  Future getMyEvents() async {
+     var url = "coachViews/getMyEvents.php?coachID=" + "&date=" + selectedDate;
+     final response = await http.get(Uri.parse(serverPath + url));
+     print(serverPath + url);
+     List<CalendarEvent> arr = [];
+    
+     for(Map<String, dynamic> i in json.decode(response.body)){
+       arr.add(CalendarEvent.fromJson(i));
+     }
+    
+     return arr;
+    }
+
+
+  
   @override
   Widget build(BuildContext context) {
     List<Task> tasks = dailyTasks[selectedDate] ?? [];
