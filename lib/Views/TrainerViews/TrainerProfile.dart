@@ -64,7 +64,7 @@ class TrainerProfilePageState extends State<TrainerProfile> {
  Future<void> getDetails() async {
 
    final SharedPreferences prefs = await SharedPreferences.getInstance();
-   final int? userID = prefs.getInt('token');
+   String? userID = await prefs.getString('token');
 
    var url = "users/getMyDetails.php?userID=" + userID;
    final response = await http.get(Uri.parse(serverPath + url));
@@ -81,8 +81,8 @@ class TrainerProfilePageState extends State<TrainerProfile> {
   
 Future updateMyDetails(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userID = prefs.getString("token");
-  
+    String? userID = await prefs.getString('token');
+
     var url = "users/updateMyDetails.php?userID=" + userID!;
     final response = await http.get(Uri.parse(serverPath + url));
     print(serverPath + url);
