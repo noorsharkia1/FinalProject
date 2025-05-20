@@ -55,12 +55,10 @@ class TrainerProfilePageState extends State<TrainerProfile> {
 
  Future<void> getDetails() async {
 
-
    final SharedPreferences prefs = await SharedPreferences.getInstance();
-   final int? lastRecipeID = prefs.getInt('lastRecipeID');
+   final int? userID = prefs.getInt('token');
 
-
-   var url = "users/getMyDetails.php?recipeID=$lastRecipeID";
+   var url = "users/getMyDetails.php?userID=" + userID;
    final response = await http.get(Uri.parse(serverPath + url));
    print(serverPath + url);
    // Map<String, dynamic> i in json.decode(response.body)
@@ -71,6 +69,21 @@ class TrainerProfilePageState extends State<TrainerProfile> {
 
 
 
+
+  
+Future updateMyDetails(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userID = prefs.getString("token");
+  
+    var url = "users/updateMyDetails.php?userID=" + userID!;
+    final response = await http.get(Uri.parse(serverPath + url));
+    print(serverPath + url);
+    setState(() { });
+    Navigator.pop(context);
+  }
+
+
+  
   
   @override
   Widget build(BuildContext context) {
@@ -117,6 +130,7 @@ class TrainerProfilePageState extends State<TrainerProfile> {
                                   _passwordController.text.isNotEmpty &&
                                   _weightController.text.isNotEmpty &&
                                   _heightController.text.isNotEmpty) {
+                                updateMyDetails(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text('Profile updated successfully!')),
                                 );
