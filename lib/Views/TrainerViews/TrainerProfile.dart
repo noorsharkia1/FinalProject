@@ -51,6 +51,14 @@ class TrainerProfilePageState extends State<TrainerProfile> {
 
 
 
+  @override
+  void initState() {
+    super.initState();
+    // _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
+    // _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+    // _controller.forward();
+    getDetails();
+  }
 
 
  Future<void> getDetails() async {
