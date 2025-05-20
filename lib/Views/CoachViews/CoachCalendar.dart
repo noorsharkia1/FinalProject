@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'DatesTr.dart'; // تأكد من اسم الملف الصحيح
 import 'package:http/http.dart' as http;
+import '../../Models/CalendarEvent.dart';
 
 
 
@@ -32,10 +33,25 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
   };
 
 
+  
+  @override
+  void initState() {
+    super.initState();
+    // _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
+    // _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+    // _controller.forward();
+    getMyEvents();
+  }
+
+
 
   
   Future getMyEvents() async {
-     var url = "coachViews/getMyEvents.php?coachID=" + "&date=" + selectedDate;
+    
+     SharedPreferences prefs = await SharedPreferences.getInstance();
+     String? userID = await prefs.getString('token');
+
+     var url = "coachViews/getMyEvents.php?coachID=" + userID +  "&date=" + selectedDate;
      final response = await http.get(Uri.parse(serverPath + url));
      print(serverPath + url);
      List<CalendarEvent> arr = [];
