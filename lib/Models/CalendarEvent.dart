@@ -1,30 +1,29 @@
 
-class Coach
+class CalendarEvent
 {
-  Coach({
-    this.coachID= 0,
-    this.fullName= "",
-    this.age= 0,
-});
+  CalendarEvent({
+      this.coachID= 0,
+      this.startHour= "",
+      this.endHour= "",
+  });
 
   int coachID;
-  String fullName;
-  int age;
+  String startHour;
+  String endHour;
 
 
-  factory Coach.fromJson(Map<String,dynamic> json)=> Coach(
+  factory CalendarEvent.fromJson(Map<String,dynamic> json)=> CalendarEvent(
     coachID: json["coachID"],
-    fullName: json["fullName"],
-    age: json["age"],
+    startHour: json["startHour"],
+    endHour: json["endHour"],
   );
 
 
-Map<String, dynamic >toJson() =>{
-  "coachID" : coachID,
-  "fullName": fullName,
-  "age": age,
-};
+  Map<String, dynamic >toJson() =>{
+    "coachID" : coachID,
+    "startHour": startHour,
+    "endHour": endHour,
+  };
 
 }
-
 

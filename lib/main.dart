@@ -89,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           if (response.statusCode == 200) {
 
-            if(checkLoginModel.fromJson(jsonDecode(response.body)).userID == 0)
+            if(checkLoginModel.fromJson(jsonDecode(response.body)).userID == "0")
             {
               Utils uti = new Utils();
               uti.showMyDialog(context, "Error", "your email or password is wrong");

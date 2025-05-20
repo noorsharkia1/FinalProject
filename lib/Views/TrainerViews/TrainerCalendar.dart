@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:finalproject/Utils/ClientConfig.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:finalproject/Views/TrainerViews/CoachList.dart' as myViews;
 import 'package:finalproject/Views/TrainerViews/TrainerProfile.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../Models/CalendarEvent.dart';
 
 class TrainerCalendar extends StatefulWidget {
   final String title;
@@ -17,12 +22,13 @@ class TrainerCalendar extends StatefulWidget {
 final TextEditingController _textstartDate = TextEditingController();
 final TextEditingController _text = TextEditingController();
 
-class _TrainerCalendarState extends State<TrainerCalendar>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
+class _TrainerCalendarState extends State<TrainerCalendar> with SingleTickerProviderStateMixin {
+   late AnimationController _controller;
+   late Animation<double> _animation;
+   late List<CalendarEvent> _availableDates = [];
+   int _selectedIndex = 1;
 
-  int _selectedIndex = 1;
+
 
   final List<Map<String, String>> trainings = [
     {"title": "Full Body Workout", "time": "Monday • 6:00 PM"},
@@ -37,12 +43,12 @@ class _TrainerCalendarState extends State<TrainerCalendar>
   //   "Thursday • 8:00 AM",
   // ];
 
-  List<String> _availableDates = [
-    "Saturday • 5:00 PM",
-    "Sunday • 7:30 AM",
-    "Tuesday • 6:15 PM",
-    "Thursday • 8:00 AM",
-  ];
+  // List<String> _availableDates = [
+  //   "Saturday • 5:00 PM",
+  //   "Sunday • 7:30 AM",
+  //   "Tuesday • 6:15 PM",
+  //   "Thursday • 8:00 AM",
+  // ];
 
 
   @override
@@ -51,26 +57,31 @@ class _TrainerCalendarState extends State<TrainerCalendar>
     _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     _controller.forward();
+    getAvailableEvents();
   }
+
+
 
 
 
   Future getAvailableEvents() async {
 
-    var url = "calendarEvents/getAvailableEvents.php";
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? coachID = await prefs.getInt('coachID');
+
+
+    var url = "calendarEvents/getAvailableEvents.php?coachID=" + coachID.toString();
     final response = await http.get(Uri.parse(serverPath + url));
     print(serverPath + url);
     List<CalendarEvent> arr = [];
-
     for(Map<String, dynamic> i in json.decode(response.body)){
-      arr.add(Coach.fromJson(i));
+      arr.add(CalendarEvent.fromJson(i));
     }
 
-    _coaches = arr;
+    _availableDates = arr;
     setState(() { });
     return arr;
   }
-
 
 
 
@@ -79,6 +90,8 @@ class _TrainerCalendarState extends State<TrainerCalendar>
     _controller.dispose();
     super.dispose();
   }
+
+
 
   void _onItemTapped(int index) {
     setState(() {
@@ -138,12 +151,23 @@ class _TrainerCalendarState extends State<TrainerCalendar>
     return date;
   }
 
-  Future insertUser(BuildContext context, DateTime startDateTime) async {
-    var url = "${serverPath}calendarEvents/insertCalendarEvent.php?userID=0&startDateTime=" + startDateTime.toString();
+
+
+
+   Future insertCalendarEvent(BuildContext context, String startDateTime) async {
+     SharedPreferences prefs = await SharedPreferences.getInstance();
+     int? coachID = await prefs.getInt('coachID');
+     String? token = await prefs.getString('token');
+
+    var url = serverPath + "calendarEvents/insertCalendarEvent.php?userID=" + token.toString() + "&coachID=" + coachID.toString() + "&startDateTime=" + startDateTime.toString();
     url = url.replaceAll(" ", "-");
     final response = await http.get(Uri.parse(url));
     print(url);
   }
+
+
+
+
 
   void _deleteTraining(int index) async {
     final confirm = await showDialog<bool>(
@@ -197,17 +221,17 @@ class _TrainerCalendarState extends State<TrainerCalendar>
               ),
             ),
             const SizedBox(height: 20),
-            ...availableDates.map((date) {
+            ..._availableDates.map((date) {
               return ListTile(
                 title: Text(
-                  date,
+                  date.startHour,
                   style: const TextStyle(fontSize: 18, color: Color(0xFF1E1F28)),
                 ),
                 trailing: const Icon(Icons.add_circle_outline, color: Colors.teal),
                 onTap: () {
                   setState(() {
-                    trainings.add({"title": "Custom Training", "time": date});
-                    insertUser(context, DateTime.now());
+                    trainings.add({"title": "Custom Training", "time": date.startHour});
+                    insertCalendarEvent(context, date.startHour);
                   });
                   Navigator.pop(context);
                 },

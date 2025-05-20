@@ -1,5 +1,13 @@
+import 'dart:convert';
 import 'dart:ui';
+import 'package:finalproject/Models/Coach.dart';
+import 'package:finalproject/Models/Favrecpes.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../Utils/ClientConfig.dart';
+
+
 
 class CoachList extends StatefulWidget {
   final String title;
@@ -10,27 +18,57 @@ class CoachList extends StatefulWidget {
 }
 
 class _CoachListState extends State<CoachList> {
-  final List<Map<String, String>> coaches = [
-    {
-      "name": "Alaa Ahmad",
-      "Location": "Haifa",
-      "Price": "35"
-    },
-    {
-      "name": "Nour Hasan",
-      "Location": "Yafa",
-      "Price": "13"
-    },
-    {
-      "name": "Omar Zaid",
-      "Location": "Haifa",
-      "Price": "40"
-    },
-  ];
+   late List<Coach> _coaches;
+
+  // final List<Map<String, String>> coaches = [
+  //   {
+  //     "name": "Alaa Ahmad",
+  //     "Location": "Haifa",
+  //     "Price": "35"
+  //   },
+  //   {
+  //     "name": "Nour Hasan",
+  //     "Location": "Yafa",
+  //     "Price": "13"
+  //   },
+  //   {
+  //     "name": "Omar Zaid",
+  //     "Location": "Haifa",
+  //     "Price": "40"
+  //   },
+  // ];
 
   int? primaryCoachIndex;
 
-  @override
+
+   @override
+   initState() {
+     print("initState Called");
+     getCoaches();
+   }
+
+
+
+   Future getCoaches() async {
+
+     var url = "calendarEvents/getCoaches.php";
+     final response = await http.get(Uri.parse(serverPath + url));
+     print(serverPath + url);
+     List<Coach> arr = [];
+
+     for(Map<String, dynamic> i in json.decode(response.body)){
+       arr.add(Coach.fromJson(i));
+     }
+
+     _coaches = arr;
+     setState(() { });
+     return arr;
+   }
+
+
+
+
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF6FAFA),
@@ -61,18 +99,19 @@ class _CoachListState extends State<CoachList> {
               const SizedBox(height: 16),
               Expanded(
                 child: ListView.builder(
-                  itemCount: coaches.length,
+                  itemCount: _coaches.length,
                   itemBuilder: (context, index) {
-                    final coach = coaches[index];
+                    Coach coach = _coaches[index];
                     final isPrimary = primaryCoachIndex == index;
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 18.0),
                       child: _buildCoachCard(
                         index: index,
-                        name: coach["name"]!,
-                        Location: coach["Location"]!,
-                        Price: coach["Price"]!,  // تصحيح هنا لاستخدام "Price" بدلاً من "price"
+                        coachID: coach.coachID,
+                        name: coach.fullName!,
+                        age: coach.age!.toString(),
+                        // Price: "0",  // تصحيح هنا لاستخدام "Price" بدلاً من "price"
                         isPrimary: isPrimary,
                       ),
                     );
@@ -87,10 +126,11 @@ class _CoachListState extends State<CoachList> {
   }
 
   Widget _buildCoachCard({
+    required int coachID,
     required int index,
     required String name,
-    required String Location,
-    required String Price,
+    required String age,
+    // required String Price,
     required bool isPrimary,
   }) {
     return AnimatedContainer(
@@ -150,27 +190,27 @@ class _CoachListState extends State<CoachList> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        Location,
+                        "Age:" + age,
                         style: TextStyle(
                           fontSize: 14,
                           color: isPrimary ? Colors.white70 : Colors.grey[700],
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        Price,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isPrimary ? Colors.white60 : Colors.grey[600],
-                        ),
-                      ),
+                      // const SizedBox(height: 2),
+                      // Text(
+                      //   Price,
+                      //   style: TextStyle(
+                      //     fontSize: 13,
+                      //     color: isPrimary ? Colors.white60 : Colors.grey[600],
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
                 isPrimary
                     ? const Icon(Icons.star_rounded, color: Colors.white, size: 28)
                     : ElevatedButton(
-                  onPressed: () => _showJoinConfirmation(index),
+                  onPressed: () => _showJoinConfirmation(index, coachID),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
                     shape: RoundedRectangleBorder(
@@ -178,9 +218,7 @@ class _CoachListState extends State<CoachList> {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                   ),
-                  child: const Text(
-                    "Join",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  child: const Text("Join", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -191,7 +229,16 @@ class _CoachListState extends State<CoachList> {
     );
   }
 
-  void _showJoinConfirmation(int index) {
+
+   Future<void> saveCoachID(coachID) async {
+     SharedPreferences prefs = await SharedPreferences.getInstance();
+     await prefs.setInt('coachID', coachID);
+
+   }
+
+
+
+   void _showJoinConfirmation(int index, int coachID) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -204,6 +251,7 @@ class _CoachListState extends State<CoachList> {
           ),
           TextButton(
             onPressed: () {
+              saveCoachID(coachID);
               setState(() {
                 primaryCoachIndex = index;
               });
