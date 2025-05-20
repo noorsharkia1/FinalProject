@@ -30,21 +30,49 @@ class _TrainerCalendarState extends State<TrainerCalendar>
     {"title": "Yoga Stretch", "time": "Friday • 8:30 AM"},
   ];
 
-  final List<String> availableDates = [
+  // final List<String> availableDates = [
+  //   "Saturday • 5:00 PM",
+  //   "Sunday • 7:30 AM",
+  //   "Tuesday • 6:15 PM",
+  //   "Thursday • 8:00 AM",
+  // ];
+
+  List<String> _availableDates = [
     "Saturday • 5:00 PM",
     "Sunday • 7:30 AM",
     "Tuesday • 6:15 PM",
     "Thursday • 8:00 AM",
   ];
 
+
   @override
   void initState() {
     super.initState();
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     _controller.forward();
   }
+
+
+
+  Future getAvailableEvents() async {
+
+    var url = "calendarEvents/getAvailableEvents.php";
+    final response = await http.get(Uri.parse(serverPath + url));
+    print(serverPath + url);
+    List<CalendarEvent> arr = [];
+
+    for(Map<String, dynamic> i in json.decode(response.body)){
+      arr.add(Coach.fromJson(i));
+    }
+
+    _coaches = arr;
+    setState(() { });
+    return arr;
+  }
+
+
+
 
   @override
   void dispose() {
@@ -64,13 +92,16 @@ class _TrainerCalendarState extends State<TrainerCalendar>
           MaterialPageRoute(builder: (context) => const TrainerProfile(title: '',)),
         );
         break;
+
       case 1:
+
         break; // Stay on current page
+
       case 2:
         Navigator.push(
            context,
-        MaterialPageRoute(builder: (context) => const myViews.CoachList(title: '',)),
-   );
+           MaterialPageRoute(builder: (context) => const myViews.CoachList(title: '',)),
+        );
         break;
     }
   }

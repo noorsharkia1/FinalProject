@@ -14,6 +14,8 @@ class DatesTr extends StatefulWidget {
 class _DatesTrPageState extends State<DatesTr> {
   List<DateTime> availableDatesWithTimes = [];
 
+  get http => null;
+
   Future<void> _pickDateTime() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
