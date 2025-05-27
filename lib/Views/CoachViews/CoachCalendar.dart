@@ -20,6 +20,9 @@ class CoachCalendarScreen extends StatefulWidget {
 class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
   DateTime selectedDate = DateTime.now();
 
+  List<CalendarEvent> _tasks = [];
+  // List<Task> _tasks = [];
+
   final List<DateTime> dates = List.generate(
     30,
         (index) => DateTime.now().add(Duration(days: index)),
@@ -63,6 +66,7 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
        arr.add(CalendarEvent.fromJson(i));
      }
 
+     // _tasks = arr;
      setState(() {
 
      });
@@ -73,7 +77,7 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
   
   @override
   Widget build(BuildContext context) {
-    List<Task> tasks = dailyTasks[selectedDate] ?? [];
+    // _tasks = dailyTasks[selectedDate] ?? [];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
@@ -106,7 +110,7 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
                   _buildDatePicker(),
                   const SizedBox(height: 30),
                   Expanded(
-                    child: tasks.isEmpty
+                    child: _tasks.isEmpty
                         ? const Center(
                       child: Text(
                         "No tasks for this day",
@@ -114,8 +118,8 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
                       ),
                     )
                         : ListView.builder(
-                      itemCount: tasks.length,
-                      itemBuilder: (context, index) => _buildTaskCard(tasks[index]),
+                      itemCount: _tasks.length,
+                      itemBuilder: (context, index) => _buildTaskCard(_tasks[index]),
                     ),
                   ),
                 ],
@@ -153,6 +157,8 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
       ),
     );
   }
+
+
 
   Widget _buildDatePicker() {
     return SizedBox(
@@ -228,7 +234,7 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
 
 
 
-  Widget _buildTaskCard(Task task) {
+  Widget _buildTaskCard(CalendarEvent task) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -254,10 +260,10 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
                 Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("👤 ${task.customerName}",
+                      Text("👤 ${task.startHour}",
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 6),
-                      Text("⏰ ${task.time}",
+                      Text("⏰ ${task.startHour}",
                           style: TextStyle(fontSize: 14, color: Colors.grey.shade800)),
                     ]),
                 const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.deepPurple),
