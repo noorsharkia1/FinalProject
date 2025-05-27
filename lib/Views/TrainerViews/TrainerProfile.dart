@@ -1,7 +1,12 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:finalproject/Views/TrainerViews/TrainerCalendar.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../Models/Favrecpes.dart';
+import '../../Utils/ClientConfig.dart';
 
 
 
@@ -66,7 +71,7 @@ class TrainerProfilePageState extends State<TrainerProfile> {
    final SharedPreferences prefs = await SharedPreferences.getInstance();
    String? userID = await prefs.getString('token');
 
-   var url = "users/getMyDetails.php?userID=" + userID;
+   var url = "users/getMyDetails.php?userID=" + userID!;
    final response = await http.get(Uri.parse(serverPath + url));
    print(serverPath + url);
    // Map<String, dynamic> i in json.decode(response.body)

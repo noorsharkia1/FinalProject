@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../Utils/ClientConfig.dart';
 import 'DatesTr.dart'; // تأكد من اسم الملف الصحيح
 import 'package:http/http.dart' as http;
 import '../../Models/CalendarEvent.dart';
@@ -51,7 +54,7 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
      SharedPreferences prefs = await SharedPreferences.getInstance();
      String? userID = await prefs.getString('token');
 
-     var url = "coachViews/getMyEvents.php?coachID=" + userID +  "&date=" + selectedDate;
+     var url = "coachViews/getMyEvents.php?coachID=" + userID! + "&date=" + selectedDate;
      final response = await http.get(Uri.parse(serverPath + url));
      print(serverPath + url);
      List<CalendarEvent> arr = [];
