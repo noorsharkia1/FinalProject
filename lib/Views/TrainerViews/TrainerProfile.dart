@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:finalproject/Views/TrainerViews/TrainerCalendar.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../Models/Favrecpes.dart';
+import '../../Models/User.dart';
 import '../../Utils/ClientConfig.dart';
 
 
@@ -19,16 +18,18 @@ class TrainerProfile extends StatefulWidget {
 }
 
 class TrainerProfilePageState extends State<TrainerProfile> {
-  final TextEditingController _firstNameController = TextEditingController(text: "أحمد");
-  final TextEditingController _lastNameController = TextEditingController(text: "المهندس");
-  final TextEditingController _emailController = TextEditingController(text: "ahmed@example.com");
-  final TextEditingController _passwordController = TextEditingController(text: "password123");
-  final TextEditingController _weightController = TextEditingController(text: "75");
-  final TextEditingController _heightController = TextEditingController(text: "175");
 
   String _gender = 'male';
   int _selectedIndex = 0;
   late User _currUserDetails;
+
+  late final TextEditingController _firstNameController;
+  late final TextEditingController _lastNameController;
+  late final TextEditingController _emailController;
+  // final TextEditingController _passwordController = TextEditingController(text: "password123");
+  late final TextEditingController _weightController;
+  late final TextEditingController _heightController;
+
 
   // Method to handle BottomNavigationBar tap
   void _onItemTapped(int index) {
@@ -45,6 +46,7 @@ class TrainerProfilePageState extends State<TrainerProfile> {
           MaterialPageRoute(builder: (context) => const TrainerCalendar(title: 'Trainer Calendar')),
         );
         break;
+
       case 2:
         // Navigator.pushReplacement(
         //   context,
@@ -77,6 +79,14 @@ class TrainerProfilePageState extends State<TrainerProfile> {
    // Map<String, dynamic> i in json.decode(response.body)
    _currUserDetails = User.fromJson(json.decode(response.body));
    setState(() {
+
+      _firstNameController = TextEditingController(text: _currUserDetails.FirstName!);
+      _lastNameController = TextEditingController(text: _currUserDetails.LastName!);
+      _emailController = TextEditingController(text: _currUserDetails.Email!);
+      _heightController = TextEditingController(text: _currUserDetails.Height!);
+      _weightController = TextEditingController(text: _currUserDetails.Weight!);
+      // _emailController = TextEditingController(text: _currUserDetails.Email!);
+
    });
  }
 
@@ -132,15 +142,16 @@ Future updateMyDetails(BuildContext context) async {
                         _buildGlassField("Weight (kg)*", _weightController, 'Enter weight'),
                         _buildGlassField("Height (cm)*", _heightController, 'Enter height'),
                         const SizedBox(height: 15),
-                        _buildGlassDropdown(),
-                        const SizedBox(height: 30),
+                        // _buildGlassDropdown(),
+                        // const SizedBox(height: 30),
                         Center(
                           child: ElevatedButton(
-                            onPressed: () {
+                            // _passwordController.text.isNotEmpty &&
+
+                          onPressed: () {
                               if (_firstNameController.text.isNotEmpty &&
                                   _lastNameController.text.isNotEmpty &&
                                   _emailController.text.isNotEmpty &&
-                                  _passwordController.text.isNotEmpty &&
                                   _weightController.text.isNotEmpty &&
                                   _heightController.text.isNotEmpty) {
                                 updateMyDetails(context);

@@ -43,13 +43,13 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
     // _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
     // _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     // _controller.forward();
-    getMyEvents();
+    getMyEvents(selectedDate);
   }
 
 
 
   
-  Future getMyEvents() async {
+  Future getMyEvents(selectedDate) async {
     
      SharedPreferences prefs = await SharedPreferences.getInstance();
      String? userID = await prefs.getString('token');
@@ -62,7 +62,10 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
      for(Map<String, dynamic> i in json.decode(response.body)){
        arr.add(CalendarEvent.fromJson(i));
      }
-    
+
+     setState(() {
+
+     });
      return arr;
     }
 
@@ -165,7 +168,13 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
               date.year == selectedDate.year;
 
           return GestureDetector(
-            onTap: () => setState(() => selectedDate = date),
+            onTap: () {
+              selectedDate = date;
+              getMyEvents(selectedDate.toString());
+            },
+
+
+            // => setState(() => selectedDate = date),
             child: Container(
               width: 72,
               padding: const EdgeInsets.all(10),
@@ -217,6 +226,8 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
     );
   }
 
+
+
   Widget _buildTaskCard(Task task) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -258,6 +269,8 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
     );
   }
 }
+
+
 
 class Task {
   final String customerName;

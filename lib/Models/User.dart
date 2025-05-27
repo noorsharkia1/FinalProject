@@ -1,33 +1,40 @@
 class User
 {
   User({
+  this.userID= "",
+  this.FirstName= "",
+  this.LastName= "",
+  this.Email= "",
+  this.Height= "",
+    this.Weight= "",
+  });
 
-  this.id= "",
-  this.name= "",
-  this.phone= "",
-  this.note= "",
-  this.address= "",
-
-});
-  String id;
-  String name;
-  String phone;
-  String note;
-  String address;
+  String userID;
+  String FirstName;
+  String LastName;
+  String Email;
+  String Height;
+  String Weight;
 
   factory User.fromJson(Map<String,dynamic> json)=> User(
-    id: json["id"],
-    name: json["name"],
-    phone:json["phone"],
-    note: json["note"],
-    address: json["address"],
+    userID: json["userID"],
+    FirstName: json["FirstName"],
+    LastName:json["LastName"],
+    Email: json["Email"],
+    Height: json["Height"],
+    Weight: json["Weight"],
   );
+
+  // {"userID":"3","FirstName":"noor","LastName":"sharkia","Email":"3@3","Height":166,"Weight":50,"Gender":""}
+
+
 Map<String, dynamic >toJson() =>{
-  "id" : id,
-  "name": name,
-  "phone": phone,
-  "note": note,
-  "address": address,
+  "id" : userID,
+  "name": FirstName,
+  "phone": LastName,
+  "Email": Email,
+  "Height": Height,
+  "Weight": Weight,
 
 };
 
