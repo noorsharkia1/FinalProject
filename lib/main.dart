@@ -1,17 +1,14 @@
 import 'dart:convert';
 import 'package:finalproject/Models/checkLoginModel.dart';
-import 'package:finalproject/Utils/ClientConfig.dart';
+import 'package:finalproject/Utils/ClientConfig.dart'; // تأكد أن هذا يحتوي على تعريف serverPath
 import 'package:finalproject/Utils/utils.dart';
 import 'package:finalproject/Views/CoachViews/CoachCalendar.dart';
 import 'package:finalproject/Views/TrainerViews/TrainerCalendar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-// شاشات ثانية (تأكد إنهم موجودين عندك)
-// import 'package:finalproject/Views/HomePage.dart';
 import 'package:finalproject/Views/RegisterScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
+const String serverPath = "https://darkgray-hummingbird-925566.hostingersite.com/noor/";
 
 void main() {
   runApp(const MyApp());
@@ -23,12 +20,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '',
+      title: 'FitSync',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: ''),
+      home: const MyHomePage(title: 'FitSync Login'),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -43,194 +41,173 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // تعاريف مهمة
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
   String? _selectedType = 'Coach'; // القيمة الابتدائية
   final List<String> _types = ['Coach', 'Trainer'];
 
-
-  // دالة تسجيل الدخول
   Future<void> checkLogin(BuildContext context) async {
-    String email = emailController.text;
-    String password = passwordController.text;
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Text("Error"),
-          content: Text("Please make sure to enter your Email and Password correctly"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("ok"),
-            )
-          ],
-        ),
-      );
+      _showDialog(context, "Error", "Please enter your Email and Password.");
+      return;
     }
-    else
-      {
-        var url = "";
-        if(_selectedType == "Coach")
-          {
-             url = "login/checkLoginCoach.php?email=$email&password=$password";
-          }
-        else
-          {
-             url = "login/checkLogin.php?email=$email&password=$password";
-          }
 
-        try {
-          final response = await http.get(Uri.parse(serverPath + url));
-          print("API URL: ${serverPath + url}");
-          print("Response: ${response.body}");
+    String url = (_selectedType == "Coach")
+        ? "login/checkLoginCoach.php?email=$email&password=$password"
+        : "login/checkLogin.php?email=$email&password=$password";
 
-          if (response.statusCode == 200) {
+    try {
+      final response = await http.get(Uri.parse(serverPath + url));
+      print("API URL: ${serverPath + url}");
+      print("Response: ${response.body}");
 
-            if(checkLoginModel.fromJson(jsonDecode(response.body)).userID == "0")
-            {
-              Utils uti = new Utils();
-              uti.showMyDialog(context, "Error", "your email or password is wrong");
-            }
-            else
-            {
-              // print("SharedPreferences 1");
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              await prefs.setString('token', checkLoginModel.fromJson(jsonDecode(response.body)).userID!);
-              await prefs.setString('gender', checkLoginModel.fromJson(jsonDecode(response.body)).gender!);
-              await prefs.setString('firstName', checkLoginModel.fromJson(jsonDecode(response.body)).firstName!);
-              if(_selectedType == "Coach")
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                      const CoachCalendarScreen()),
-                );
+      if (response.statusCode == 200) {
+        final loginData = checkLoginModel.fromJson(jsonDecode(response.body));
 
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) =>
-                //         const HomePageScreen(title: 'Home Page')));
-              }
-              else
-                {
-                  // هون ممكن تعمل فحص على البيانات الراجعة لو بدك
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //       builder: (context) =>
-                  //       const HomePageScreen(title: 'Home Page')));
+        if (loginData.userID == "0") {
+          _showDialog(context, "Error", "Your email or password is wrong.");
+        } else {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', loginData.userID!);
+          await prefs.setString('gender', loginData.gender!);
+          await prefs.setString('firstName', loginData.firstName!);
 
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                          const TrainerCalendar(title: 'TrainerCalendar')));
-
-
-                }
-            }
-          }
-          else {
-            showDialog(
-              context: context,
-              builder: (_) => AlertDialog(
-                title: Text("Error"),
-                content: Text("Login failed, please try again "),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text("ok"),
-                  )
-                ],
-              ),
+          if (_selectedType == "Coach") {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const CoachCalendarScreen()),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const TrainerCalendar(title: 'TrainerCalendar')),
             );
           }
-        } catch (e) {
-          print("Error: $e");
         }
-
+      } else {
+        _showDialog(context, "Error", "Login failed, please try again.");
       }
+    } catch (e) {
+      print("Error: $e");
+      _showDialog(context, "Error", "An error occurred. Please try again later.");
+    }
+  }
 
+  void _showDialog(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK")
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("FitSync")
+        title: Text(widget.title),
+        centerTitle: true,
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             children: <Widget>[
-              Text(
-                "Type:",
+              const Text(
+                "User Type:",
                 style: TextStyle(fontSize: 20),
               ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'User Type',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  value: _selectedType,
-                  items: _types.map((type) {
-                    return DropdownMenuItem(
-                      value: type,
-                      child: Text(type),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedType = value;
-                    });
-                  },
+              const SizedBox(height: 10),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: 'Select User Type',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                value: _selectedType,
+                items: _types
+                    .map((type) => DropdownMenuItem(
+                  value: type,
+                  child: Text(type),
+                ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedType = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 20),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Email:",
+                  style: TextStyle(fontSize: 20),
                 ),
               ),
-
-
-              Text(
-                "Email:",
-                style: TextStyle(fontSize: 20),
-              ),
+              const SizedBox(height: 8),
               TextField(
                 controller: emailController,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Email'),
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Enter your email',
+                ),
+                keyboardType: TextInputType.emailAddress,
               ),
-              SizedBox(height: 16),
-              Text(
-                "Password:",
-                style: TextStyle(fontSize: 20),
+              const SizedBox(height: 16),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Password:",
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
+              const SizedBox(height: 8),
               TextField(
                 controller: passwordController,
                 obscureText: true,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Password'),
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Enter your password',
+                ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () => checkLogin(context),
-                child: Text('Login'),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  child: Text('Login', style: TextStyle(fontSize: 18)),
+                ),
               ),
+              const SizedBox(height: 15),
               TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                        const RegisterScreen(title: "New Account")),
+                        builder: (context) => const RegisterScreen(title: "Create New Account")),
                   );
                 },
-                child: Text('Create New Account'),
+                child: const Text('Create New Account'),
               ),
             ],
           ),

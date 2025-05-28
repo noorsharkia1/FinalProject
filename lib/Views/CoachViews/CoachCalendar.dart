@@ -2,13 +2,47 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../Utils/ClientConfig.dart';
-import 'DatesTr.dart'; // تأكد من اسم الملف الصحيح
 import 'package:http/http.dart' as http;
-import '../../Models/CalendarEvent.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'DatesTr.dart';
 
+// موديل المواعيد
+class CalendarEvent {
+  final String coachID;
+  final String startHour;
+  final String fullName;
+
+  CalendarEvent({
+    required this.coachID,
+    required this.startHour,
+    required this.fullName,
+  });
+
+  factory CalendarEvent.fromJson(Map<String, dynamic> json) {
+    return CalendarEvent(
+      coachID: json['coachID'] ?? '',
+      startHour: json['startDateTime'] != null
+          ? DateFormat('hh:mm a').format(DateTime.parse(json['startDateTime']))
+          : '',
+      fullName: json['fullName'] ?? '',
+    );
+  }
+}
+
+// جلب المواعيد من السيرفر
+Future<List<CalendarEvent>> fetchCoachEvents(String coachID, String date) async {
+  final url = Uri.parse(
+      'https://darkgray-hummingbird-925566.hostingersite.com/noor/coachViews/getMyEvents.php?coachID=$coachID&date=$date');
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = json.decode(response.body);
+    return data.map((json) => CalendarEvent.fromJson(json)).toList();
+  } else {
+    throw Exception('Failed to load events');
+  }
+}
 
 class CoachCalendarScreen extends StatefulWidget {
   const CoachCalendarScreen({super.key});
@@ -19,66 +53,47 @@ class CoachCalendarScreen extends StatefulWidget {
 
 class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
   DateTime selectedDate = DateTime.now();
-
   List<CalendarEvent> _tasks = [];
-  // List<Task> _tasks = [];
 
   final List<DateTime> dates = List.generate(
     30,
         (index) => DateTime.now().add(Duration(days: index)),
   );
 
-  final Map<DateTime, List<Task>> dailyTasks = {
-    DateTime.now(): [
-      Task(customerName: "Ahmed Abdullah", time: "10:00 AM"),
-      Task(customerName: "Sarah Mansour", time: "12:00 PM"),
-    ],
-    DateTime.now().add(Duration(days: 1)): [
-      Task(customerName: "Laila Khalil", time: "9:30 AM"),
-    ],
-  };
+  String? coachID;
 
-
-  
   @override
   void initState() {
     super.initState();
-    // _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
-    // _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
-    // _controller.forward();
-    getMyEvents(selectedDate);
+    _loadCoachIDAndEvents();
   }
 
-
-
-  
-  Future getMyEvents(selectedDate) async {
-    
-     SharedPreferences prefs = await SharedPreferences.getInstance();
-     String? userID = await prefs.getString('token');
-
-     var url = "coachViews/getMyEvents.php?coachID=" + userID! + "&date=" + selectedDate;
-     final response = await http.get(Uri.parse(serverPath + url));
-     print(serverPath + url);
-     List<CalendarEvent> arr = [];
-    
-     for(Map<String, dynamic> i in json.decode(response.body)){
-       arr.add(CalendarEvent.fromJson(i));
-     }
-
-     // _tasks = arr;
-     setState(() {
-
-     });
-     return arr;
+  Future<void> _loadCoachIDAndEvents() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    coachID = prefs.getString('token');
+    if (coachID != null) {
+      await getMyEvents(selectedDate);
     }
+  }
 
+  Future<void> getMyEvents(DateTime date) async {
+    if (coachID == null) return;
+    final dateStr = DateFormat('yyyy-MM-dd').format(date);
 
-  
+    try {
+      List<CalendarEvent> events = await fetchCoachEvents(coachID!, dateStr);
+      setState(() {
+        _tasks = events;
+      });
+    } catch (e) {
+      setState(() {
+        _tasks = [];
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // _tasks = dailyTasks[selectedDate] ?? [];
-
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       body: Stack(
@@ -113,13 +128,14 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
                     child: _tasks.isEmpty
                         ? const Center(
                       child: Text(
-                        "No tasks for this day",
+                        "لا يوجد مواعيد في هذا اليوم",
                         style: TextStyle(fontSize: 16, color: Colors.black54),
                       ),
                     )
                         : ListView.builder(
                       itemCount: _tasks.length,
-                      itemBuilder: (context, index) => _buildTaskCard(_tasks[index]),
+                      itemBuilder: (context, index) =>
+                          _buildTaskCard(_tasks[index]),
                     ),
                   ),
                 ],
@@ -135,15 +151,11 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const DatesTr(title: 'Available Dates'),
+                builder: (context) => DatesTr(title: ''),
               ),
             );
           }
         },
-        backgroundColor: Colors.white.withOpacity(0.95),
-        elevation: 10,
-        selectedItemColor: Colors.deepPurple,
-        unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_month),
@@ -157,8 +169,6 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
       ),
     );
   }
-
-
 
   Widget _buildDatePicker() {
     return SizedBox(
@@ -175,19 +185,21 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
 
           return GestureDetector(
             onTap: () {
-              selectedDate = date;
-              getMyEvents(selectedDate.toString());
+              setState(() {
+                selectedDate = date;
+              });
+              getMyEvents(date);
             },
-
-
-            // => setState(() => selectedDate = date),
             child: Container(
               width: 72,
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.white.withOpacity(0.2) : Colors.white.withOpacity(0.1),
+                color: isSelected
+                    ? Colors.white.withOpacity(0.2)
+                    : Colors.white.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: isSelected ? Colors.deepPurple : Colors.transparent),
+                border: Border.all(
+                    color: isSelected ? Colors.deepPurple : Colors.transparent),
                 boxShadow: isSelected
                     ? [
                   BoxShadow(
@@ -210,7 +222,8 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: isSelected ? Colors.deepPurple : Colors.black87,
+                          color:
+                          isSelected ? Colors.deepPurple : Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -218,7 +231,9 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
                         DateFormat('MMM').format(date),
                         style: TextStyle(
                           fontSize: 14,
-                          color: isSelected ? Colors.deepPurple : Colors.grey.shade700,
+                          color: isSelected
+                              ? Colors.deepPurple
+                              : Colors.grey.shade700,
                         ),
                       ),
                     ],
@@ -231,8 +246,6 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
       ),
     );
   }
-
-
 
   Widget _buildTaskCard(CalendarEvent task) {
     return Container(
@@ -254,19 +267,20 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("👤 ${task.startHour}",
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 6),
-                      Text("⏰ ${task.startHour}",
-                          style: TextStyle(fontSize: 14, color: Colors.grey.shade800)),
-                    ]),
-                const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.deepPurple),
+                Text(
+                  "👤 ${task.fullName.isEmpty ? 'بدون اسم' : task.fullName}",
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  "⏰ ${task.startHour}",
+                  style:
+                  TextStyle(fontSize: 14, color: Colors.grey.shade800),
+                ),
               ],
             ),
           ),
@@ -274,12 +288,4 @@ class _CoachCalendarScreenState extends State<CoachCalendarScreen> {
       ),
     );
   }
-}
-
-
-
-class Task {
-  final String customerName;
-  final String time;
-  Task({required this.customerName, required this.time});
 }

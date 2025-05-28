@@ -1,14 +1,14 @@
 import 'dart:convert';
-
-import 'package:finalproject/Utils/ClientConfig.dart';
-import 'package:flutter/material.dart';
 import 'dart:ui';
-import 'package:finalproject/Views/TrainerViews/CoachList.dart' as myViews;
-import 'package:finalproject/Views/TrainerViews/TrainerProfile.dart';
+
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Models/CalendarEvent.dart';
+import 'package:finalproject/Utils/ClientConfig.dart';
+import 'package:finalproject/Views/TrainerViews/CoachList.dart' as myViews;
+import 'package:finalproject/Views/TrainerViews/TrainerProfile.dart';
 
 class TrainerCalendar extends StatefulWidget {
   final String title;
@@ -19,71 +19,28 @@ class TrainerCalendar extends StatefulWidget {
   State<TrainerCalendar> createState() => _TrainerCalendarState();
 }
 
-final TextEditingController _textstartDate = TextEditingController();
-final TextEditingController _text = TextEditingController();
+class _TrainerCalendarState extends State<TrainerCalendar>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
-class _TrainerCalendarState extends State<TrainerCalendar> with SingleTickerProviderStateMixin {
-   late AnimationController _controller;
-   late Animation<double> _animation;
-   late List<CalendarEvent> _availableDates = [];
-   int _selectedIndex = 1;
-
-
-
-  final List<Map<String, String>> trainings = [
-    {"title": "Full Body Workout", "time": "Monday • 6:00 PM"},
-    {"title": "Cardio Session", "time": "Wednesday • 7:00 AM"},
-    {"title": "Yoga Stretch", "time": "Friday • 8:30 AM"},
-  ];
-
-  // final List<String> availableDates = [
-  //   "Saturday • 5:00 PM",
-  //   "Sunday • 7:30 AM",
-  //   "Tuesday • 6:15 PM",
-  //   "Thursday • 8:00 AM",
-  // ];
-
-  // List<String> _availableDates = [
-  //   "Saturday • 5:00 PM",
-  //   "Sunday • 7:30 AM",
-  //   "Tuesday • 6:15 PM",
-  //   "Thursday • 8:00 AM",
-  // ];
-
+  List<Map<String, String>> trainings = [];
+  List<CalendarEvent> _availableDates = [];
+  int _selectedIndex = 1;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     _controller.forward();
+
+    loadTrainings();
     getAvailableEvents();
   }
-
-
-
-
-
-  Future getAvailableEvents() async {
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? coachID = await prefs.getInt('coachID');
-
-
-    var url = "calendarEvents/getAvailableEvents.php?coachID=" + coachID.toString();
-    final response = await http.get(Uri.parse(serverPath + url));
-    print(serverPath + url);
-    List<CalendarEvent> arr = [];
-    for(Map<String, dynamic> i in json.decode(response.body)){
-      arr.add(CalendarEvent.fromJson(i));
-    }
-
-    _availableDates = arr;
-    setState(() { });
-    return arr;
-  }
-
-
 
   @override
   void dispose() {
@@ -91,7 +48,48 @@ class _TrainerCalendarState extends State<TrainerCalendar> with SingleTickerProv
     super.dispose();
   }
 
+  Future<void> loadTrainings() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? encodedTrainings = prefs.getStringList('trainings');
+    if (encodedTrainings != null) {
+      setState(() {
+        trainings = encodedTrainings
+            .map((e) => Map<String, String>.from(json.decode(e)))
+            .toList();
+      });
+    }
+  }
 
+  Future<void> saveTrainings() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> encodedTrainings =
+    trainings.map((e) => json.encode(e)).toList();
+    await prefs.setStringList('trainings', encodedTrainings);
+  }
+
+  Future<void> getAvailableEvents() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? coachID = prefs.getInt('coachID');
+
+    if (coachID == null) return;
+
+    var url = "calendarEvents/getAvailableEvents.php?coachID=$coachID";
+    final response = await http.get(Uri.parse(serverPath + url));
+    if (response.statusCode == 200) {
+      List<CalendarEvent> arr = [];
+      for (Map<String, dynamic> i in json.decode(response.body)) {
+        arr.add(CalendarEvent.fromJson(i));
+      }
+      setState(() {
+        _availableDates = arr;
+      });
+    } else {
+      // Handle error or empty response
+      setState(() {
+        _availableDates = [];
+      });
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -102,72 +100,42 @@ class _TrainerCalendarState extends State<TrainerCalendar> with SingleTickerProv
       case 0:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const TrainerProfile(title: '',)),
+          MaterialPageRoute(
+            builder: (context) => const TrainerProfile(title: ''),
+          ),
         );
         break;
-
       case 1:
-
-        break; // Stay on current page
-
+      // Stay on current page
+        break;
       case 2:
         Navigator.push(
-           context,
-           MaterialPageRoute(builder: (context) => const myViews.CoachList(title: '',)),
+          context,
+          MaterialPageRoute(
+            builder: (context) => const myViews.CoachList(title: ''),
+          ),
         );
         break;
     }
   }
 
-  DateTime _parseTrainingTime(String timeStr) {
-    final parts = timeStr.split(' • ');
-    final day = parts[0];
-    final time = parts[1];
-    final now = DateTime.now();
+  Future insertCalendarEvent(BuildContext context, String startDateTime) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? coachID = prefs.getInt('coachID');
+    String? token = prefs.getString('token');
 
-    final daysMap = {
-      'Sunday': 0,
-      'Monday': 1,
-      'Tuesday': 2,
-      'Wednesday': 3,
-      'Thursday': 4,
-      'Friday': 5,
-      'Saturday': 6,
-    };
+    if (coachID == null || token == null) return;
 
-    final timeParts = time.split(':');
-    final hour = int.parse(timeParts[0]);
-    final minute = int.parse(timeParts[1].split(' ')[0]);
-    final isPM = time.toLowerCase().contains('pm');
-
-    final parsedHour = isPM && hour != 12 ? hour + 12 : (hour == 12 && !isPM ? 0 : hour);
-    final targetWeekday = daysMap[day]!;
-
-    var date = DateTime(now.year, now.month, now.day, parsedHour, minute);
-    while (date.weekday % 7 != targetWeekday) {
-      date = date.add(const Duration(days: 1));
-    }
-
-    return date;
-  }
-
-
-
-
-   Future insertCalendarEvent(BuildContext context, String startDateTime) async {
-     SharedPreferences prefs = await SharedPreferences.getInstance();
-     int? coachID = await prefs.getInt('coachID');
-     String? token = await prefs.getString('token');
-
-    var url = serverPath + "calendarEvents/insertCalendarEvent.php?userID=" + token.toString() + "&coachID=" + coachID.toString() + "&startDateTime=" + startDateTime.toString();
+    var url = serverPath +
+        "calendarEvents/insertCalendarEvent.php?userID=$token&coachID=$coachID&startDateTime=$startDateTime";
     url = url.replaceAll(" ", "-");
     final response = await http.get(Uri.parse(url));
-    print(url);
+    if (response.statusCode != 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to add event to server')),
+      );
+    }
   }
-
-
-
-
 
   void _deleteTraining(int index) async {
     final confirm = await showDialog<bool>(
@@ -179,7 +147,8 @@ class _TrainerCalendarState extends State<TrainerCalendar> with SingleTickerProv
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text("Cancel", style: TextStyle(color: Color(0xFF4A4A4A))),
+              child:
+              const Text("Cancel", style: TextStyle(color: Color(0xFF4A4A4A))),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
@@ -194,6 +163,7 @@ class _TrainerCalendarState extends State<TrainerCalendar> with SingleTickerProv
       setState(() {
         trainings.removeAt(index);
       });
+      await saveTrainings();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Training deleted")),
@@ -228,11 +198,15 @@ class _TrainerCalendarState extends State<TrainerCalendar> with SingleTickerProv
                   style: const TextStyle(fontSize: 18, color: Color(0xFF1E1F28)),
                 ),
                 trailing: const Icon(Icons.add_circle_outline, color: Colors.teal),
-                onTap: () {
+                onTap: () async {
                   setState(() {
-                    trainings.add({"title": "Custom Training", "time": date.startHour});
-                    insertCalendarEvent(context, date.startHour);
+                    trainings.add({
+                      "title": "Custom Training",
+                      "time": date.startHour,
+                    });
                   });
+                  await insertCalendarEvent(context, date.startHour);
+                  await saveTrainings();
                   Navigator.pop(context);
                 },
               );
@@ -326,6 +300,44 @@ class _TrainerCalendarState extends State<TrainerCalendar> with SingleTickerProv
     );
   }
 
+  DateTime _parseTrainingTime(String timeStr) {
+    final parts = timeStr.split(' • ');
+    final day = parts[0];
+    final time = parts[1];
+    final now = DateTime.now();
+
+    final daysMap = {
+      'Sunday': 7,
+      'Monday': 1,
+      'Tuesday': 2,
+      'Wednesday': 3,
+      'Thursday': 4,
+      'Friday': 5,
+      'Saturday': 6,
+    };
+
+    final timeParts = time.split(':');
+    int hour = int.parse(timeParts[0]);
+    final minute = int.parse(timeParts[1].split(' ')[0]);
+    final isPM = time.toLowerCase().contains('pm');
+
+    if (isPM && hour != 12) {
+      hour += 12;
+    }
+    if (!isPM && hour == 12) {
+      hour = 0;
+    }
+
+    final targetWeekday = daysMap[day]!;
+    DateTime date = DateTime(now.year, now.month, now.day, hour, minute);
+
+    while (date.weekday != targetWeekday) {
+      date = date.add(const Duration(days: 1));
+    }
+
+    return date;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -360,8 +372,10 @@ class _TrainerCalendarState extends State<TrainerCalendar> with SingleTickerProv
                   ),
                   TextButton.icon(
                     onPressed: _showFilterOptions,
-                    icon: const Icon(Icons.filter_list, size: 20, color: Color(0xFF1E1F28)),
-                    label: const Text('Filter', style: TextStyle(color: Color(0xFF1E1F28))),
+                    icon:
+                    const Icon(Icons.filter_list, size: 20, color: Color(0xFF1E1F28)),
+                    label: const Text('Filter',
+                        style: TextStyle(color: Color(0xFF1E1F28))),
                   ),
                 ],
               ),
@@ -395,7 +409,8 @@ class _TrainerCalendarState extends State<TrainerCalendar> with SingleTickerProv
                     backgroundColor: const Color(0xFF2E8B8B),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
                     elevation: 6,
                   ),
                 ),
@@ -454,8 +469,9 @@ class _TrainerCalendarState extends State<TrainerCalendar> with SingleTickerProv
           ),
           child: Row(
             children: [
-              const Icon(Icons.sports_gymnastics, color: Color(0xFF1E1F28), size: 30),
-              const SizedBox(width: 14),
+              const Icon(Icons.sports_gymnastics,
+                  color: Color(0xFF1E1F28), size: 30),
+              const SizedBox(width: 15),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -463,17 +479,18 @@ class _TrainerCalendarState extends State<TrainerCalendar> with SingleTickerProv
                     Text(
                       title,
                       style: const TextStyle(
+                        fontWeight: FontWeight.w700,
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
                         color: Color(0xFF1E1F28),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Text(
                       time,
-                      style: TextStyle(
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
                         fontSize: 14,
-                        color: Colors.grey.shade700,
+                        color: Colors.black87,
                       ),
                     ),
                   ],
